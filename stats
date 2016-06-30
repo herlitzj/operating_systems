@@ -10,7 +10,7 @@ build_matrix () {
   echo "Rows: $ROWS, Cols: $COLS"
 
   for ((i=1;i<=ROWS;i++)) do
-    for ((j=1;j<=COLS;j++)) do
+    for ((j=1; j<=COLS; j++)) do
       MATRIX[$i,$j]=$(cat <(echo "$INPUT") | head -$i | tail -1 | cut -f $j)
     done
   done
@@ -20,27 +20,38 @@ build_matrix () {
 compute_rows () {
   local ROWS=$1
   local COLS=$2
-  echo "Rows"
-  echo "Average Median"
-  for ((i=1;i<=ROWS;i++)) do
+  echo "Average	Median"
+  for ((i=1; i<=ROWS; i++)) do
     local TEMPSUM=0
     local TEMPROW=""
     local TEMPMED=0
-    local TEMPCUT=$((($COLS+1) / 2))
-    for ((j=1;j<=COLS;j++)) do
+    local -i TEMPCUT=$((($COLS+1) / 2))
+    if [ $(($COLS % 2)) -eq 0 ]; then TEMPCUT++; fi
+    for ((j=1; j<=COLS; j++)) do
       TEMPSUM=$(($TEMPSUM + ${MATRIX[$i,$j]}))
       TEMPROW+="${MATRIX[$i,$j]}	"
     done
     TEMPROW=${TEMPROW%?} #trim trailing \t
-    TEMPMED=$(cat <(echo "$TEMPROW") | tr "\t" "\n" | sort | head -$TEMPCUT | tail -1)
-    let "SUM = ($TEMPSUM + ($COLS/2)) / $COLS"
-    echo "$SUM	$TEMPMED"
+    local MEDIAN=$(cat <(echo "$TEMPROW") | tr "\t" "\n" | sort | head -$TEMPCUT | tail -1)
+    let "AVERAGE = ($TEMPSUM + ($COLS/2)) / $COLS"
+    echo "$AVERAGE	$MEDIAN"
   done
 }
 
 #function for handling columns
 compute_cols () {
   echo "Cols"
+  local ROWS=$1
+  local COLS=$2
+  local -i TEMPCUT=$((($ROWS+1) / 2))
+  if [ $(($ROWS % 2)) -eq  0 ]; then TEMPCUT+=1; fi
+  local MEDIAN=""
+  echo "Average"
+  echo "Median"
+  for ((i=1; i<=COLS; i++)) do
+    MEDIAN+="$(echo "$INPUT" | cut -f $i | sort | head -$TEMPCUT | tail -1)	"
+  done
+  echo "$MEDIAN"
 }
 
 main() {
