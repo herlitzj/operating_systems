@@ -46,8 +46,8 @@ compute_cols () {
   local AVERAGE=""
   echo "Average"
   for ((i=1; i<=COLS; i++)) do
-    local TEMP=$(( $(echo "$INPUT" | cut -f $i | tr "\n" "+" | cut -f 1-$(( $COLS*2-1 )) -d"+") ))
-    AVERAGE+="$(( ($TEMP + ($ROWS/2)) / $ROWS ))	"
+    local TEMPSUM=$(( $(echo "$INPUT" | cut -f $i | tr "\n" "+" | cut -f 1-$(( $COLS*2-1 )) -d"+") ))
+    AVERAGE+="$(( ($TEMPSUM + ($ROWS/2)) / $ROWS ))	"
   done
   echo "$AVERAGE"
   echo "Median"
