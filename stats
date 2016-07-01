@@ -30,7 +30,7 @@ compute_rows () {
       TEMPROW+="${MATRIX[$i,$j]}	"
     done
     TEMPROW=${TEMPROW%?} #trim trailing \t
-    local MEDIAN=$(cat <(echo "$TEMPROW") | tr "\t" "\n" | sort | head -$TEMPCUT | tail -1)
+    local MEDIAN=$(cat <(echo "$TEMPROW") | tr "\t" "\n" | sort -n | head -$TEMPCUT | tail -1)
     let "AVERAGE = ($TEMPSUM + ($COLS/2)) / $COLS"
     echo "$AVERAGE	$MEDIAN"
   done
@@ -42,6 +42,7 @@ compute_cols () {
   local COLS=$2
   local -i TEMPCUT=$((($ROWS+1) / 2))
   if [ $(($ROWS % 2)) -eq  0 ]; then TEMPCUT+=1; fi
+  echo "TEMPCUT: $TEMPCUT"
   local MEDIAN=""
   local AVERAGE=""
   echo "Average"
@@ -52,7 +53,7 @@ compute_cols () {
   echo "$AVERAGE"
   echo "Median"
   for ((i=1; i<=COLS; i++)) do
-    MEDIAN+="$(echo "$INPUT" | cut -f $i | sort | head -$TEMPCUT | tail -1)	"
+    MEDIAN+="$(echo "$INPUT" | cut -f $i | sort -n | head -$TEMPCUT | tail -1)	"
   done
   echo "$MEDIAN"
 }
