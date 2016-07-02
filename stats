@@ -40,15 +40,13 @@ compute_rows () {
 compute_cols () {
   local ROWS=$1
   local COLS=$2
-  echo "COLS: $COLS, ROWS: $ROWS"
   local -i TEMPCUT=$((($ROWS+1) / 2))
   if [ $(($ROWS % 2)) -eq  0 ]; then TEMPCUT+=1; fi
-  echo "TEMPCUT: $TEMPCUT"
   local MEDIAN=""
   local AVERAGE=""
   echo "Average"
   for ((i=1; i<=COLS; i++)) do
-    local TEMPSUM=$(( $(echo "$INPUT" | cut -f $i | tr "\n" "+" | cut -f 1-$(( $COLS*2-1 )) -d"+") ))
+    local TEMPSUM=$(( $(echo "$INPUT" | cut -f $i | tr "\n" "+" | cut -f 1-$(( $ROWS*2-1 )) -d"+") ))
     AVERAGE+="$(( ($TEMPSUM + ($ROWS/2)) / $ROWS ))	"
   done
   echo "$AVERAGE"
@@ -62,7 +60,7 @@ compute_cols () {
 main() {
   local PROGNAME=$0
   local R_C_FLAG=$1
-  local USAGE="$PROGNAME: {-rows|-cols} [file]"
+  local USAGE="Usage: $PROGNAME: {-rows|-cols} [file]"
   local declare INPUT
 
   #Test if input is from a file or from stdin
