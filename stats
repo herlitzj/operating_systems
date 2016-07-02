@@ -83,6 +83,7 @@ main() {
       fi
     elif [ $# -eq 1  ]
     then
+      #test if there is input from stdin
       if [ ! -t 0 ]
       then
         #deal with stdin input
