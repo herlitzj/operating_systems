@@ -62,40 +62,22 @@ main() {
   local R_C_FLAG=$1
   local USAGE="Usage: $PROGNAME: {-rows|-cols} [file]"
   local declare INPUT
-
-  #Test if input is from a pipe
-  if [ ! -p /dev/fd/0 ]
+  echo "INPUTS: "$#"
+  #Test if input is from a file or from stdin
+  if [ ! -p "$2" ]
   then
-    #test if there are two params
-    if [ $# -eq 2 ]
-    then
-      #deal with file input param
-      if [ ! -f $2 ]
-      then
-        echo "$PROGNAME: Cannot read file $2" >&2
-        exit 1
-      elif [ ! -r $2 ]
-      then
-        echo "$PROGNAME: Cannot read file $2" >&2
-        exit 1
-      else
-        INPUT=$(cat $2)
-      fi
-    elif [ $# -eq 1  ]
-    then
-      if [ ! -t 0 ]
-      then
-        #deal with stdin input
-        INPUT=$(cat "-")
-      else
-        echo "$USAGE" >&2
-        exit 1
-      fi
-    else
-      echo "$USAGE" >&2
-      exit 1
-    fi
-  #load stream from pipe
+    INPUT=$(cat $2)
+  #catch invalid file input
+  elif [ ! -f $2 ]
+  then
+    echo "$PROGNAME: Cannot read file $2" >&2
+    exit 1
+  #catch too many args
+  elif [ $# -gt 2 ]
+  then
+    echo "$USAGE" >&2
+    exit 1
+  #load stream from stdin
   else
     #catch too few args
     if [ $# -lt 1 ]
