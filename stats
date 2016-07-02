@@ -58,53 +58,63 @@ compute_cols () {
 }
 
 main() {
+  #setup variables
   local PROGNAME=$0
   local R_C_FLAG=$1
   local USAGE="Usage: $PROGNAME: {-rows|-cols} [file]"
   local declare INPUT
 
+  #Deal with all possible input options pipe/stdin/file param
   #Test if input is from a pipe
   if [ ! -p /dev/fd/0 ]
   then
     #test if there are two params
     if [ $# -eq 2 ]
     then
-      #deal with file input param
-      if [ ! -f $2 ]
+      #if so deal with file input param
+      #test if file exists
+      if [ ! -e $2 ]
       then
-        echo "$PROGNAME: Cannot read file $2" >&2
+        echo "$PROGNAME: $2 file does not exist" >&2
         exit 1
+      #test if file is readable
       elif [ ! -r $2 ]
       then
         echo "$PROGNAME: Cannot read file $2" >&2
         exit 1
+      #if file exists and is readable, read into INPUT
       else
         INPUT=$(cat $2)
       fi
+    #test if there is only 1 param, if so assume stdin
     elif [ $# -eq 1  ]
     then
       #test if there is input from stdin
       if [ ! -t 0 ]
       then
-        #deal with stdin input
+        #if so read into INPUT
         INPUT=$(cat "-")
       else
+        #if not print usage and exit 
         echo "$USAGE" >&2
         exit 1
       fi
+    #if params are not 1 or 2, print usage and exit
     else
       echo "$USAGE" >&2
       exit 1
     fi
-  #load stream from pipe
+  #if input is from a pipe
   else
-    #catch too few args
-    if [ $# -lt 1 ]
+    #test if 1 argument. If so, read pipe into INPUT
+    if [ $# -eq 1 ]
     then
+      INPUT=$(cat "-")
+    else
+      #otherwise print usage and exit
       echo "$USAGE" >&2
       exit 1
     fi
-    INPUT=$(cat "-")
   fi
 
   #build row and column counts for use in loops
