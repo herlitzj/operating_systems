@@ -40,6 +40,7 @@ compute_rows () {
 compute_cols () {
   local ROWS=$1
   local COLS=$2
+  echo "COLS: $COLS, ROWS: $ROWS"
   local -i TEMPCUT=$((($ROWS+1) / 2))
   if [ $(($ROWS % 2)) -eq  0 ]; then TEMPCUT+=1; fi
   echo "TEMPCUT: $TEMPCUT"
