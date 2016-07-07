@@ -9,7 +9,7 @@ for _ in range(3):
     f.close()
     print temp_string
 
-num1 = random.randint(1, 43)
+num1 = random.randint(1,43)
 num2 = random.randint(1,43)
 
 print num1, " * ", num2, " = ",  num1 * num2
