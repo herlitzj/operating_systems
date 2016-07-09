@@ -44,7 +44,9 @@ void create_rooms(char* directory) {
     char *file_name = room_names[i];
     snprintf(file_location, BUFFER_SIZE, "%s/%s.txt", directory, file_name);
     FILE *f = fopen(file_location, "w");
-    fprintf(f, "ROOM NAME:: %s\n", file_name);
+    fprintf(f, "ROOM NAME: %s\n", file_name);
+    fprintf(f, "CONNECTION:");
+    fprintf(f,"ROOM TYPE: ");
     fclose(f);
   }
 
