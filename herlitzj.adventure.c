@@ -23,34 +23,31 @@ char* create_directory() {
 
 void create_rooms(char* directory) {
   printf("Creating rooms\n");
-  int buffer_size = 100;
-  char *file_location = malloc(buffer_size);
-  char *file_name = "/test.txt";
+  int i;
+  const BUFFER_SIZE = 100;
+  const NUMBER_OF_ROOMS = 7;
+  char *room_names[10] = {
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten"
+  };
 
-  snprintf(file_location, buffer_size, "%s%s", directory, file_name);
+  for(i=0; i<NUMBER_OF_ROOMS; i++) {
+    char *file_location = malloc(BUFFER_SIZE);
+    char *file_name = room_names[i];
+    snprintf(file_location, BUFFER_SIZE, "%s/%s.txt", directory, file_name);
+    FILE *f = fopen(file_location, "w");
+    fprintf(f, "ROOM NAME:: %s\n", file_name);
+    fclose(f);
+  }
 
-
-  FILE *f = fopen(file_location, "w");
-  /*if (f == NULL)
-  {
-    printf("Error opening file!\n");
-    exit(1);
-  }*/ 
-
-  /* print some text */
-  const char *text = "Write this to the file";
-  fprintf(f, "Some text: %s\n", text);
-
-  /* print integers and floats */
-  int i = 1;
-  float py = 3.1415927;
-  fprintf(f, "Integer: %d, float: %f\n", i, py);
-
-  /* printing single chatacters */
-  char c = 'A';
-  fprintf(f, "A character: %c\n", c);
-
-  fclose(f);
 }
 
 int main() {
