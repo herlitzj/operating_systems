@@ -11,7 +11,7 @@ struct Room {
   char *name;
   char *type;
   int num_of_connections;
-  char *connections[6];
+  char *connections[10];
 };
 
 // Basic swap function for randomization of rooms
@@ -33,6 +33,15 @@ void shuffle_rooms(char *rooms[], int size) {
 
 }
 
+int already_connected(char *room_name, char *connections[], int size){
+  int i;
+  for (i = 0; i < size; i++) {
+    if (connections[i] == NULL) connections[i] = "";
+    if (strcmp(room_name, connections[i]) == 0) return 0;
+  }
+  return 1;
+}
+
 // function to create the rooms directory
 char* create_directory() {
   int buffer_size = 25; 
@@ -48,6 +57,26 @@ char* create_directory() {
   }
 
   return directory;
+}
+
+void build_connections(struct Room rooms[], int index) {
+
+  // choose number of connections to make (3 to 6)
+  int num_connections_to_make = rand() % 4 + 3;
+  while (rooms[index].num_of_connections < num_connections_to_make) {
+    // randomly choose a room to connect to
+    int connection_index = rand() % 7;
+    char *tmp_name = rooms[connection_index].name;
+    // check if chosen room is current room or if rooms are already connected
+    if(connection_index != index && already_connected(tmp_name, rooms[index].connections, 7) == 1) {
+      // connect the rooms
+      rooms[index].connections[rooms[index].num_of_connections] = tmp_name;
+      rooms[index].num_of_connections++;
+      rooms[connection_index].connections[rooms[connection_index]\
+        .num_of_connections] = rooms[index].name;
+      rooms[connection_index].num_of_connections++;
+    }
+  }
 }
 
 void create_rooms(char* directory) {
@@ -74,6 +103,7 @@ void create_rooms(char* directory) {
 
   shuffle_rooms(room_names, 10); // random shuffle of room names
 
+  // initialize an array of empty Room structs
   for (i = 0; i < 7; i++) {
     struct Room tmp;
     tmp.name = room_names[i];
@@ -82,8 +112,15 @@ void create_rooms(char* directory) {
     rooms[i] = tmp;
   }
 
+  // Loop through the array of Room structs and build connections
   for (i = 0; i < 7; i++) {
-    printf("ROOM: %s\nTYPE: %s\n", rooms[i].name, rooms[i].type);
+    build_connections(rooms, i);
+  }
+  printf("CONNECTIONS BUILT\n");
+
+  for (i = 0; i < 7; i++) {
+    printf("NAME: %s\n", rooms[i].name);
+    printf("NUM: %i\n\n", rooms[i].num_of_connections);
   }
 
 /*
