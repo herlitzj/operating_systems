@@ -152,7 +152,7 @@ int main() {
   char *directory = create_directory();
   printf("DIR: %s\n", directory);
   char *start_room = create_rooms(directory);
-
+  printf("CURRENT LOCATION: %s\n", start_room);
   return 0;
 }
 
