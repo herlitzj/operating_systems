@@ -8,24 +8,25 @@
 
 // Room struct to hold all room information during intialization
 struct Room {
-  char *name;
-  char *type;
+  char name[50];
+  char type[15];
   int num_of_connections;
-  char *connections[10];
+  char connections[10][50];
 };
 
 // Basic swap function for randomization of rooms
-void swap(char *a[], int i, int j) {
-  char *t = a[i];
-  a[i] = a[j];
-  a[j] = t;
+void swap(char a[][50], int i, int j) {
+  char t[50];
+  strcpy(t,  a[i]);
+  strcpy(a[i], a[j]);
+  strcpy(a[j], t);  
 }
 
 // Function for shuffling the array of room names for game initialization
-void shuffle_rooms(char *rooms[], int size) {
+void shuffle_rooms(char rooms[][50], int size) {
   int i, tmp;
   srand(time(NULL));
-
+  printf("SHUFFLING");
   for (i = (size-1); i > 0; i--) {
     tmp = rand() % (i + 1);
     swap(rooms, i, tmp);
@@ -33,10 +34,10 @@ void shuffle_rooms(char *rooms[], int size) {
 
 }
 
-int already_connected(char *room_name, char *connections[], int size){
+int already_connected(char room_name[], char connections[][50], int size){
   int i;
   for (i = 0; i < size; i++) {
-    if (connections[i] == NULL) connections[i] = "";
+    if (connections[i] == NULL) strcpy(connections[i], "");
     if (strcmp(room_name, connections[i]) == 0) return 0;
   }
   return 1;
@@ -60,26 +61,27 @@ char* create_directory() {
 }
 
 void build_connections(struct Room rooms[], int index) {
-
+  printf("BUILDING CONNECTIONS");
   // choose number of connections to make (3 to 6)
   int num_connections_to_make = rand() % 4 + 3;
   while (rooms[index].num_of_connections < num_connections_to_make) {
     // randomly choose a room to connect to
     int connection_index = rand() % 7;
-    char *tmp_name = rooms[connection_index].name;
+    char tmp_name[50];
+    strcpy(tmp_name, rooms[connection_index].name);
     // check if chosen room is current room or if rooms are already connected
     if(connection_index != index && already_connected(tmp_name, rooms[index].connections, 7) == 1) {
       // connect the rooms
-      rooms[index].connections[rooms[index].num_of_connections] = tmp_name;
+      strcpy(rooms[index].connections[rooms[index].num_of_connections], tmp_name);
       rooms[index].num_of_connections++;
-      rooms[connection_index].connections[rooms[connection_index]\
-        .num_of_connections] = rooms[index].name;
+      strcpy(rooms[connection_index].connections[rooms[connection_index].num_of_connections],\
+             rooms[index].name);
       rooms[connection_index].num_of_connections++;
     }
   }
 }
 
-char* create_rooms(char* directory) {
+struct Room create_rooms(char* directory) {
   printf("Creating rooms\n");
   // Basic variables
   int i,j;
@@ -88,7 +90,7 @@ char* create_rooms(char* directory) {
 
   // Room generation variables
   struct Room rooms[10]; // array of structs to hold the room information on init
-  char *room_names[10] = {
+  char room_names[][50] = {
     "one",
     "two",
     "three",
@@ -106,8 +108,8 @@ char* create_rooms(char* directory) {
   // initialize an array of empty Room structs
   for (i = 0; i < NUMBER_OF_ROOMS; i++) {
     struct Room tmp;
-    tmp.name = room_names[i];
-    tmp.type = "MID_ROOM";
+    strcpy(tmp.name, room_names[i]);
+    strcpy(tmp.type, "MID_ROOM");
     tmp.num_of_connections = 0;
     rooms[i] = tmp;
   }
@@ -126,13 +128,14 @@ char* create_rooms(char* directory) {
     end_index = rand() % 7;
   }
 
-  rooms[start_index].type = "START_ROOM";
-  rooms[end_index].type = "END_ROOM"; 
+  strcpy(rooms[start_index].type, "START_ROOM");
+  strcpy(rooms[end_index].type, "END_ROOM"); 
 
   // save room structs to disc
   for (i = 0; i < NUMBER_OF_ROOMS; i++) {
     char *file_location = malloc(BUFFER_SIZE);
-    char *room_name = rooms[i].name;
+    char room_name[50];
+    strcpy(room_name, rooms[i].name);
     snprintf(file_location, BUFFER_SIZE, "%s/%s.txt", directory, room_name);
     FILE *f = fopen(file_location, "w");
     fprintf(f, "ROOM NAME: %s\n", room_name);
@@ -144,15 +147,21 @@ char* create_rooms(char* directory) {
   }
 
   printf("SAVED TO DISC\n");
-  return rooms[start_index].name;
+  return rooms[start_index];
 }
 
 int main() {
   int i;
+  struct Room start_room;
   char *directory = create_directory();
+  char current_room_type[20];
   printf("DIR: %s\n", directory);
-  char *start_room = create_rooms(directory);
-  printf("CURRENT LOCATION: %s\n", start_room);
+  start_room = create_rooms(directory);
+  strcpy(current_room_type, start_room.type);
+
+  while(strcmp(current_room_type, "END_ROOM") != 0) {
+    
+  }
   return 0;
 }
 
