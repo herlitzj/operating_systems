@@ -26,7 +26,7 @@ void swap(char a[][50], int i, int j) {
 void shuffle_rooms(char rooms[][50], int size) {
   int i, tmp;
   srand(time(NULL));
-  printf("SHUFFLING");
+
   for (i = (size-1); i > 0; i--) {
     tmp = rand() % (i + 1);
     swap(rooms, i, tmp);
@@ -61,7 +61,6 @@ char* create_directory() {
 }
 
 void build_connections(struct Room rooms[], int index) {
-  printf("BUILDING CONNECTIONS");
   // choose number of connections to make (3 to 6)
   int num_connections_to_make = rand() % 4 + 3;
   while (rooms[index].num_of_connections < num_connections_to_make) {
@@ -82,7 +81,6 @@ void build_connections(struct Room rooms[], int index) {
 }
 
 struct Room create_rooms(char* directory) {
-  printf("Creating rooms\n");
   // Basic variables
   int i,j;
   const int BUFFER_SIZE = 100;
@@ -118,7 +116,6 @@ struct Room create_rooms(char* directory) {
   for (i = 0; i < NUMBER_OF_ROOMS; i++) {
     build_connections(rooms, i);
   }
-  printf("CONNECTIONS BUILT\n");
 
   // choose a start and an end room
   int start_index = rand() % 7;
@@ -146,22 +143,74 @@ struct Room create_rooms(char* directory) {
     fclose(f);
   }
 
-  printf("SAVED TO DISC\n");
   return rooms[start_index];
 }
 
+// function for reading room from disc and loading into a struct
+struct Room get_room(char *directory, char *room_name) {
+  struct Room new_room;
+  const BUFFER_SIZE = 50;
+  char *buffer = malloc(BUFFER_SIZE);
+  snprintf(buffer, BUFFER_SIZE, "%s/%s.txt", directory, room_name);
+  FILE *f = fopen(buffer, "r");
+
+  fgets(buffer, BUFFER_SIZE, f);
+  strcpy(new_room.name, buffer);
+  strcpy(new_room.type, "MID_ROOM");
+  strcpy(new_room.connections[0], "twelve");
+  strcpy(new_room.connections[1], "thirteen");
+
+  fclose(f);
+
+  return new_room;
+}
+
 int main() {
-  int i;
-  struct Room start_room;
+  int i, steps=0;
+  struct Room current_room;
   char *directory = create_directory();
   char current_room_type[20];
+  char route[100][50];
+  char *input;
+
+  // Initial prep
   printf("DIR: %s\n", directory);
-  start_room = create_rooms(directory);
-  strcpy(current_room_type, start_room.type);
+  current_room = create_rooms(directory);
+  strcpy(current_room_type, current_room.type);
 
   while(strcmp(current_room_type, "END_ROOM") != 0) {
+    // Load current room info
+    printf("CURRENT LOCATION: %s\n", current_room.name);
+    printf("POSSIBLE CONNECTIONS: ");
+    for(i = 0; i < current_room.num_of_connections - 1; i++) {
+      printf("%s, ", current_room.connections[i]);
+    }
+    printf("%s.\nWHERE TO? >", current_room.connections[current_room.num_of_connections - 1]);
+
+    // Get user input
+    scanf("%s", input);
+    current_room = get_room(directory, input);
+
+    // Check for input in room list
+    int match = 1;
+    for(i = 0; i < current_room.num_of_connections; i++) {
+      if(strcmp(current_room_type, current_room.connections[i]) == 0) {
+        strcpy(route[steps], current_room_type);
+        steps++;
+        printf("\n");
+        match = 0;
+      }
+    }
     
+    if(match == 1) printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
   }
+
+  printf("YOU FOUND THE END ROOM. CONGRATULATIONS!\n");
+  printf("YOU TOOK %i STEPS. YOUR PATH TO VICTORY WAS: \n", steps);
+  for(i = 0; i < steps; i++) {
+    printf("%s\n", route[i]);
+  }
+
   return 0;
 }
 
