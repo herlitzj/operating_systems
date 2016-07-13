@@ -148,21 +148,52 @@ struct Room create_rooms(char* directory) {
 
 // function for reading room from disc and loading into a struct
 struct Room get_room(char *directory, char *room_name) {
+  int i;
   struct Room new_room;
-  const BUFFER_SIZE = 50;
-  char *buffer = malloc(BUFFER_SIZE);
+  printf("\nDIR: %s, RM: %s\n\n", directory, room_name);
+  const BUFFER_SIZE = 512;
+  int lines = 0;
+  int ch = 0;
+  char buffer[BUFFER_SIZE];
   snprintf(buffer, BUFFER_SIZE, "%s/%s.txt", directory, room_name);
   FILE *f = fopen(buffer, "r");
 
+  // count number of lines in file
+  while(!feof(f))
+  {
+    ch = fgetc(f);
+    if(ch == '\n')
+    {
+      lines++;
+    }
+  }
+
+  printf("Lines: %i\n\n", lines);
+
+  // Rewind to beginning and get room name
+  rewind(f);
+  fseek(f, 11, SEEK_CUR);
   fgets(buffer, BUFFER_SIZE, f);
   strcpy(new_room.name, buffer);
-  strcpy(new_room.type, "MID_ROOM");
-  strcpy(new_room.connections[0], "twelve");
-  strcpy(new_room.connections[1], "thirteen");
+
+  // Get connections
+  for(i = 0; i < lines - 2; i++) {
+    fseek(f, 14, SEEK_CUR);
+    fgets(buffer, BUFFER_SIZE, f);
+    printf("CON: %s\n", buffer);
+    strcpy(new_room.connections[i], buffer);
+  }
+
+  // Get room type
+  fseek(f, 11, SEEK_CUR);
+  fgets(buffer, BUFFER_SIZE, f);
+  printf("TYPE: %s\n", buffer);
+  strcpy(new_room.type, buffer);
 
   fclose(f);
 
   return new_room;
+
 }
 
 int main() {
@@ -171,7 +202,7 @@ int main() {
   char *directory = create_directory();
   char current_room_type[20];
   char route[100][50];
-  char *input;
+  char input[256];
 
   // Initial prep
   printf("DIR: %s\n", directory);
@@ -181,6 +212,7 @@ int main() {
   while(strcmp(current_room_type, "END_ROOM") != 0) {
     // Load current room info
     printf("CURRENT LOCATION: %s\n", current_room.name);
+    printf("CURRENT ROOM TYPE: %s\n", current_room.type);
     printf("POSSIBLE CONNECTIONS: ");
     for(i = 0; i < current_room.num_of_connections - 1; i++) {
       printf("%s, ", current_room.connections[i]);
@@ -189,16 +221,16 @@ int main() {
 
     // Get user input
     scanf("%s", input);
-    current_room = get_room(directory, input);
 
     // Check for input in room list
     int match = 1;
     for(i = 0; i < current_room.num_of_connections; i++) {
-      if(strcmp(current_room_type, current_room.connections[i]) == 0) {
+      if(strcmp(input, current_room.connections[i]) == 0) {
         strcpy(route[steps], current_room_type);
         steps++;
         printf("\n");
         match = 0;
+        current_room = get_room(directory, input);
       }
     }
     
