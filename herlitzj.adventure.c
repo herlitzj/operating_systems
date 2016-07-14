@@ -174,19 +174,24 @@ struct Room get_room(char *directory, char *room_name) {
   rewind(f);
   fseek(f, 11, SEEK_CUR);
   fgets(buffer, BUFFER_SIZE, f);
+  buffer[strlen(buffer) - 1] = '\0';
   strcpy(new_room.name, buffer);
 
   // Get connections
   for(i = 0; i < lines - 2; i++) {
     fseek(f, 14, SEEK_CUR);
     fgets(buffer, BUFFER_SIZE, f);
+    buffer[strlen(buffer) - 1] = '\0';
     printf("CON: %s\n", buffer);
+    printf("LEN: %i\n", strlen(buffer));
     strcpy(new_room.connections[i], buffer);
+    new_room.num_of_connections++;
   }
 
   // Get room type
   fseek(f, 11, SEEK_CUR);
   fgets(buffer, BUFFER_SIZE, f);
+  buffer[strlen(buffer) - 1] = '\0';
   printf("TYPE: %s\n", buffer);
   strcpy(new_room.type, buffer);
 
