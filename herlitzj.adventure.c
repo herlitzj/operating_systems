@@ -150,7 +150,6 @@ struct Room create_rooms(char* directory) {
 struct Room get_room(char *directory, char *room_name) {
   int i;
   struct Room new_room;
-  printf("\nDIR: %s, RM: %s\n\n", directory, room_name);
   const BUFFER_SIZE = 512;
   int lines = 0;
   int ch = 0;
@@ -168,8 +167,6 @@ struct Room get_room(char *directory, char *room_name) {
     }
   }
 
-  printf("Lines: %i\n\n", lines);
-
   // Rewind to beginning and get room name
   rewind(f);
   fseek(f, 11, SEEK_CUR);
@@ -182,8 +179,6 @@ struct Room get_room(char *directory, char *room_name) {
     fseek(f, 14, SEEK_CUR);
     fgets(buffer, BUFFER_SIZE, f);
     buffer[strlen(buffer) - 1] = '\0';
-    printf("CON: %s\n", buffer);
-    printf("LEN: %i\n", strlen(buffer));
     strcpy(new_room.connections[i], buffer);
     new_room.num_of_connections++;
   }
@@ -192,7 +187,6 @@ struct Room get_room(char *directory, char *room_name) {
   fseek(f, 11, SEEK_CUR);
   fgets(buffer, BUFFER_SIZE, f);
   buffer[strlen(buffer) - 1] = '\0';
-  printf("TYPE: %s\n", buffer);
   strcpy(new_room.type, buffer);
 
   fclose(f);
@@ -214,7 +208,7 @@ int main() {
   current_room = create_rooms(directory);
   strcpy(current_room_type, current_room.type);
 
-  while(strcmp(current_room_type, "END_ROOM") != 0) {
+  while(strcmp(current_room.type, "END_ROOM") != 0) {
     // Load current room info
     printf("CURRENT LOCATION: %s\n", current_room.name);
     printf("CURRENT ROOM TYPE: %s\n", current_room.type);
@@ -231,7 +225,7 @@ int main() {
     int match = 1;
     for(i = 0; i < current_room.num_of_connections; i++) {
       if(strcmp(input, current_room.connections[i]) == 0) {
-        strcpy(route[steps], current_room_type);
+        strcpy(route[steps], current_room.name);
         steps++;
         printf("\n");
         match = 0;
