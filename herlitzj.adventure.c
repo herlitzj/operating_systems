@@ -112,16 +112,16 @@ struct Room create_rooms(char* directory) {
   // Room generation variables
   struct Room rooms[NUMBER_OF_ROOMS]; // array of structs to hold the room information on init
   char room_names[][50] = {
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-    "nine",
-    "ten"
+    "Inferno",
+    "Limbo",
+    "Lust",
+    "Gluttony",
+    "Greed",
+    "Wrath",
+    "Heresy",
+    "Violence",
+    "Fraud",
+    "Treachery"
   };
 
   shuffle_rooms(room_names, NUMBER_OF_ROOMS); // random shuffle of room names
