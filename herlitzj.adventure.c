@@ -150,6 +150,7 @@ struct Room create_rooms(char* directory) {
 struct Room get_room(char *directory, char *room_name) {
   int i;
   struct Room new_room;
+  new_room.num_of_connections = 0;
   const BUFFER_SIZE = 512;
   int lines = 0;
   int ch = 0;
@@ -195,6 +196,11 @@ struct Room get_room(char *directory, char *room_name) {
 
 }
 
+char pluralize(num_of_steps) {
+  if(num_of_steps == 1) return '\0';
+  else return 'S';
+}
+
 int main() {
   int i, steps=0;
   struct Room current_room;
@@ -204,14 +210,13 @@ int main() {
   char input[256];
 
   // Initial prep
-  printf("DIR: %s\n", directory);
   current_room = create_rooms(directory);
   strcpy(current_room_type, current_room.type);
 
+  printf("\n");
   while(strcmp(current_room.type, "END_ROOM") != 0) {
     // Load current room info
     printf("CURRENT LOCATION: %s\n", current_room.name);
-    printf("CURRENT ROOM TYPE: %s\n", current_room.type);
     printf("POSSIBLE CONNECTIONS: ");
     for(i = 0; i < current_room.num_of_connections - 1; i++) {
       printf("%s, ", current_room.connections[i]);
@@ -237,7 +242,7 @@ int main() {
   }
 
   printf("YOU FOUND THE END ROOM. CONGRATULATIONS!\n");
-  printf("YOU TOOK %i STEPS. YOUR PATH TO VICTORY WAS: \n", steps);
+  printf("YOU TOOK %i STEP%c. YOUR PATH TO VICTORY WAS: \n", steps, pluralize(steps));
   for(i = 0; i < steps; i++) {
     printf("%s\n", route[i]);
   }
