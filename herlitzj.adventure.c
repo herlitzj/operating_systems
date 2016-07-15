@@ -6,7 +6,10 @@
 #include <string.h>
 #include <time.h>
 
+/* ----------------------------------- HELPER FUNCTIONS --------------------------------*/
+
 // Room struct to hold all room information during intialization
+// and gameplay
 struct Room {
   char name[50];
   char type[15];
@@ -34,6 +37,7 @@ void shuffle_rooms(char rooms[][50], int size) {
 
 }
 
+// Simple function to check if two rooms are already connected
 int already_connected(char room_name[], char connections[][50], int size){
   int i;
   for (i = 0; i < size; i++) {
@@ -42,6 +46,17 @@ int already_connected(char room_name[], char connections[][50], int size){
   }
   return 1;
 }
+
+// A simple function for pluralizing 'STEP(S)' in end game message
+char pluralize(num_of_steps) {
+  if(num_of_steps == 1) return '\0';
+  else return 'S';
+}
+
+/*------------------------- END HELPER FUNCTIONS -------------------------------*/
+
+
+/* -------------------------- GAMEPLAY AND INIT FUNCTIONS ------------------------*/
 
 // function to create the rooms directory
 char* create_directory() {
@@ -60,17 +75,24 @@ char* create_directory() {
   return directory;
 }
 
+// Function for building connections between rooms
 void build_connections(struct Room rooms[], int index) {
   // choose number of connections to make (3 to 6)
   int num_connections_to_make = rand() % 4 + 3;
+
+  // Loop until num_of_connections is fulfilled
   while (rooms[index].num_of_connections < num_connections_to_make) {
+
     // randomly choose a room to connect to
     int connection_index = rand() % 7;
     char tmp_name[50];
     strcpy(tmp_name, rooms[connection_index].name);
-    // check if chosen room is current room or if rooms are already connected
+
+    // check to make sure chosen room is not current room and that
+    // rooms are not already connected
     if(connection_index != index && already_connected(tmp_name, rooms[index].connections, 7) == 1) {
-      // connect the rooms
+
+      // if not, connect the rooms
       strcpy(rooms[index].connections[rooms[index].num_of_connections], tmp_name);
       rooms[index].num_of_connections++;
       strcpy(rooms[connection_index].connections[rooms[connection_index].num_of_connections],\
@@ -84,10 +106,11 @@ struct Room create_rooms(char* directory) {
   // Basic variables
   int i,j;
   const int BUFFER_SIZE = 100;
-  const int NUMBER_OF_ROOMS = 7;
+  const int NUMBER_OF_ROOMS = 10;
+  const int NUMBER_TO_CHOOSE = 7;
 
   // Room generation variables
-  struct Room rooms[10]; // array of structs to hold the room information on init
+  struct Room rooms[NUMBER_OF_ROOMS]; // array of structs to hold the room information on init
   char room_names[][50] = {
     "one",
     "two",
@@ -101,10 +124,10 @@ struct Room create_rooms(char* directory) {
     "ten"
   };
 
-  shuffle_rooms(room_names, 10); // random shuffle of room names
+  shuffle_rooms(room_names, NUMBER_OF_ROOMS); // random shuffle of room names
 
   // initialize an array of empty Room structs
-  for (i = 0; i < NUMBER_OF_ROOMS; i++) {
+  for (i = 0; i < NUMBER_TO_CHOOSE; i++) {
     struct Room tmp;
     strcpy(tmp.name, room_names[i]);
     strcpy(tmp.type, "MID_ROOM");
@@ -113,7 +136,7 @@ struct Room create_rooms(char* directory) {
   }
 
   // Loop through the array of Room structs and build connections
-  for (i = 0; i < NUMBER_OF_ROOMS; i++) {
+  for (i = 0; i < NUMBER_TO_CHOOSE; i++) {
     build_connections(rooms, i);
   }
 
@@ -129,7 +152,7 @@ struct Room create_rooms(char* directory) {
   strcpy(rooms[end_index].type, "END_ROOM"); 
 
   // save room structs to disc
-  for (i = 0; i < NUMBER_OF_ROOMS; i++) {
+  for (i = 0; i < NUMBER_TO_CHOOSE; i++) {
     char *file_location = malloc(BUFFER_SIZE);
     char room_name[50];
     strcpy(room_name, rooms[i].name);
@@ -146,7 +169,8 @@ struct Room create_rooms(char* directory) {
   return rooms[start_index];
 }
 
-// function for reading room from disc and loading into a struct
+// Function for reading room info from disc and loading into a struct
+// that can be used by main to load the prompt
 struct Room get_room(char *directory, char *room_name) {
   int i;
   struct Room new_room;
@@ -158,7 +182,7 @@ struct Room get_room(char *directory, char *room_name) {
   snprintf(buffer, BUFFER_SIZE, "%s/%s.txt", directory, room_name);
   FILE *f = fopen(buffer, "r");
 
-  // count number of lines in file
+  // count number of lines in file so that the program knows how many connections there are
   while(!feof(f))
   {
     ch = fgetc(f);
@@ -196,26 +220,24 @@ struct Room get_room(char *directory, char *room_name) {
 
 }
 
-char pluralize(num_of_steps) {
-  if(num_of_steps == 1) return '\0';
-  else return 'S';
-}
+/*------------------------- END GAMEPLAY AND INIT FUNCTIONS ---------------------------*/
 
 int main() {
   int i, steps=0;
-  struct Room current_room;
-  char *directory = create_directory();
-  char current_room_type[20];
-  char route[100][50];
-  char input[256];
+  struct Room current_room; // Struct to hold room params
+  char *directory = create_directory(); // Directory in which to put room files
+  char current_room_type[20]; // Var for ending game when type == END_ROOM
+  char route[100][50]; // Array to hold route
+  char input[256]; // String to hold user input
 
   // Initial prep
+  // Create all the rooms, save them to file and return the START_ROOM struct
   current_room = create_rooms(directory);
   strcpy(current_room_type, current_room.type);
 
   printf("\n");
   while(strcmp(current_room.type, "END_ROOM") != 0) {
-    // Load current room info
+    // Load current room info into user prompt
     printf("CURRENT LOCATION: %s\n", current_room.name);
     printf("POSSIBLE CONNECTIONS: ");
     for(i = 0; i < current_room.num_of_connections - 1; i++) {
@@ -223,10 +245,10 @@ int main() {
     }
     printf("%s.\nWHERE TO? >", current_room.connections[current_room.num_of_connections - 1]);
 
-    // Get user input
+    // Get user input (i.e. where do they want to go?)
     scanf("%s", input);
 
-    // Check for input in room list
+    // Check for input in room list to make sure it's valid choice
     int match = 1;
     for(i = 0; i < current_room.num_of_connections; i++) {
       if(strcmp(input, current_room.connections[i]) == 0) {
@@ -238,9 +260,11 @@ int main() {
       }
     }
     
+    // If invalid, print warning
     if(match == 1) printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
   }
 
+  // When while loop exits, end game, print message, and exit 0
   printf("YOU FOUND THE END ROOM. CONGRATULATIONS!\n");
   printf("YOU TOOK %i STEP%c. YOUR PATH TO VICTORY WAS: \n", steps, pluralize(steps));
   for(i = 0; i < steps; i++) {
