@@ -202,6 +202,7 @@ struct Room get_room(char *directory, char *room_name) {
   strcpy(new_room.name, buffer);
 
   // Get connections
+  // subtract two from lines to read to discount room_name and room_type lines
   for(i = 0; i < lines - 2; i++) {
     fseek(f, 14, SEEK_CUR);
     fgets(buffer, BUFFER_SIZE, f);
