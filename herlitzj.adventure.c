@@ -102,6 +102,8 @@ void build_connections(struct Room rooms[], int index) {
   }
 }
 
+// Function for creating rooms to initialize game
+// Saves created rooms to disc and returns the START_ROOM struct
 struct Room create_rooms(char* directory) {
   // Basic variables
   int i,j;
