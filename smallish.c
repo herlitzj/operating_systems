@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-
+#include <unistd.h>
 char *get_input() {
   char *input = NULL;
   ssize_t bufferSize = 0;
@@ -27,8 +26,28 @@ char **parse_input(char *input) {
   return parsedInput;
 }
 
+int execute(char **args) {
+  pid_t pid, wpid;
+  int status;
+
+  if((pid = fork()) < 0) {
+    perror("Error forking child process");
+  } else if (pid == 0) {
+    if(execvp(args[0], args) < 0) {
+      perror("Error executing child process");
+      exit(EXIT_FAILURE);
+    }
+  } else {
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+
+  return 1;
+}
+
 void smallish() {
-  char *userInput;  
+  char *userInput;
   char **args;
   int status, i=0;
 
@@ -41,6 +60,8 @@ void smallish() {
     printf("Input After: %s\n", userInput);
     for(i = 0; i<3; i++) printf("ARG %i: %s ", i, args[i]);
     printf("\n");
+    printf("EXECUTING");
+    execute(args);
     status = 1;
 
     free(userInput);
