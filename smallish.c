@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+
 char *get_input() {
   char *input = NULL;
   ssize_t bufferSize = 0;
@@ -26,7 +28,18 @@ char **parse_input(char *input) {
   return parsedInput;
 }
 
-int execute(char **args) {
+int change_directory(char **args) {
+  if (args[1] == NULL) {
+    perror("smallish: expected argument to \"cd\"\n");
+  } else {
+    if (chdir(args[1]) != 0) {
+      perror("smallish");
+    }
+  }
+  return 1;
+}
+
+int execute_command(char **args) {
   pid_t pid, wpid;
   int status;
 
@@ -37,19 +50,56 @@ int execute(char **args) {
       perror("Error executing child process");
       exit(EXIT_FAILURE);
     }
+
+    int signal = WIFSIGNALED(status);
+    printf("CSignal: %i\n", signal);
   } else {
     do {
       wpid = waitpid(pid, &status, WUNTRACED);
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+      int signal = WIFSIGNALED(status);
+      printf("WPID: %i\n", wpid);
+      printf("WPID Status: %i\n", status);
+      printf("WSignal: %i\n", signal);
+    } while(status);//while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    
   }
 
   return 1;
 }
 
-void smallish() {
+int execute(char **args) {
+  int i;
+
+  if (args[0] == NULL) {
+   return 1;
+  }
+  
+  if (strcmp(args[0], "cd") == 0) {
+    return change_directory(args);
+  } else if (strcmp(args[0], "exit") == 0) {
+    return 0;
+  } else if (args[0][0] == '#') {
+    return 1;
+  }
+    
+  return execute_command(args);
+}
+
+void catchInt(int signo) {
+  printf("Caught an interrupt: %d\n", signo);
+}
+
+int main(int argc, char **argv) {
   char *userInput;
   char **args;
   int status, i=0;
+
+  struct sigaction act;
+  act.sa_handler = catchInt;
+  act.sa_flags = 0;
+  sigfillset(&(act.sa_mask));
+
+  sigaction(SIGINT, &act, NULL);
 
   do {
     printf(": ");
@@ -60,18 +110,13 @@ void smallish() {
     printf("Input After: %s\n", userInput);
     for(i = 0; i<3; i++) printf("ARG %i: %s ", i, args[i]);
     printf("\n");
-    printf("EXECUTING");
-    execute(args);
-    status = 1;
+    printf("EXECUTING\n");
+    status = execute(args);
 
     free(userInput);
     free(args);
 
   } while(status);
 
-}
-
-int main(int argc, char **argv) {
-  smallish();
   return 0;
 }
