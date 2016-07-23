@@ -3,12 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-const MAX_LINE = 2048;
-
-void printDirectoryContents(char *directory) {
-  printf("%s\n", directory);
-}
-
 char *get_input() {
   char *input = NULL;
   ssize_t bufferSize = 0;
