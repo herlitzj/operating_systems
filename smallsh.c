@@ -23,15 +23,9 @@ int count_args(char **args) {
   return i--;
 }
 
-void print_stderr() {
-  int c;
-  FILE *file;
-  file = fopen("/dev/stderr", "r");
-  if (file) {
-    while ((c = getc(file)) != EOF)
-      putchar(c);
-    fclose(file);
-  }
+void print_status(int status) {
+  if(status > 1) printf("terminated by signal %i\n", status);
+  else printf("exit status %i\n", status);
 }
 
 char **parse_input(char *input) {
@@ -151,9 +145,8 @@ int execute(char **args, int prevStatus) {
     return 1;
   } else if (args[0][0] == '#') {
     return 0;
-  } else if (strcmp(args[0], "status") == 0) {
-    printf("HERE IS THE STATUS \n", prevStatus);
-    print_stderr();
+  } else if(strcmp(args[0], "status") == 0) {
+    print_status(prevStatus);
     return 0;
   }
     
@@ -174,7 +167,7 @@ int main() {
     printf(": ");
     userInput = get_input();
     args = parse_input(userInput);
-    if(strcmp(args[0], "exit") == 0) break;
+    //if(strcmp(args[0], "exit") == 0) break;
     status = execute(args, status);
     //free(userInput);
     //free(args);
