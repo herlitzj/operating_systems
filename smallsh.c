@@ -25,7 +25,6 @@ int count_args(char **args) {
 void print_status(int status) {
   if(WIFSIGNALED(status)) printf("terminated by signal %i\n", WTERMSIG(status));
   else if(WIFEXITED(status)) printf("exit value %i\n", WEXITSTATUS(status));
-  fflush(stdout);
 }
 
 // function for parsing the input to tokenize args, etc.
@@ -64,7 +63,7 @@ int get_arg_index(char keyChar, char **args) {
   for(i = 0; i < numberOfArgs; i++) {
     if(args[i][0] == keyChar) return i; // return the index of the key character if found
   }
-  return -1;
+  return -1; // return -1 if not found
 }
 
 // a helper function for executing child processes
@@ -74,7 +73,6 @@ void execute_child(char *file_args, char *exec_args, int is_output) {
   fd = open(file_args, flags, 0644);
   if(fd == -1) {
     perror("open");
-    fflush(stdout);
     exit(1);
   }
   fd2 = dup2(fd, is_output);
@@ -82,8 +80,7 @@ void execute_child(char *file_args, char *exec_args, int is_output) {
     perror("dup2");
     exit(1);
   }
-  fflush(stdout);
-  fflush(stdin);
+  if(!is_output) fflush(stdin);
   execlp(exec_args, exec_args, NULL);
 }
 
@@ -120,7 +117,6 @@ int execute_command(char **args) {
     if(backgroundIndex > 0) { // handle waiting/message for background child
       wpid = waitpid(pid, &status, WNOHANG);
       printf("background pid is %i\n", pid);
-      fflush(stdout);
     } else { // deal with foreground processes
       do {
         wpid = waitpid(pid, &status, WUNTRACED);
@@ -169,16 +165,14 @@ int main() {
       pid = waitpid(-1, &status, WNOHANG);
       if(pid > 0) {
         printf("background pid %i is done: ", pid);
-        fflush(stdout);
         print_status(status);
       }
     } while (pid > 0);
-
     printf(": ");
-    fflush(stdout);
     userInput = get_input(); // get user input
     args = parse_input(userInput); // parse user input
     status = execute(args, status); // execute user input
+    fflush(stdout);
   } while(1);
 
   return 0;
