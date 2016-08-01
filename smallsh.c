@@ -20,13 +20,9 @@ int count_args(char **args) {
   return i--;
 }
 
-// function for printing the status
+// function for printing the status of the most recently
+// completed process or background process
 void print_status(int status) {
-  //printf("STATUS: %i\n", status);
-  //printf("WIFEXITED: %i\n", WIFEXITED(status));
-  //printf("WEXITSTATUS: %i\n", WEXITSTATUS(status));
-  //printf("WIFSIGNALED: %i\n", WIFSIGNALED(status));
-  //printf("WTERMSIG: %i\n", WTERMSIG(status));
   if(WIFSIGNALED(status)) printf("terminated by signal %i\n", WTERMSIG(status));
   else if(WIFEXITED(status)) printf("exit value %i\n", WEXITSTATUS(status));
   fflush(stdout);
@@ -61,6 +57,7 @@ int change_directory(char **args) {
 }
 
 // function for getting the index of any key characters in the args
+// used for easily finding where in the tokenized list args to stop/end
 int get_arg_index(char keyChar, char **args) {
   int i;
   int numberOfArgs = count_args(args);
@@ -70,7 +67,7 @@ int get_arg_index(char keyChar, char **args) {
   return -1;
 }
 
-// a helper function for executing child commands
+// a helper function for executing child processes
 void execute_child(char *file_args, char *exec_args, int is_output) {
   int flags = is_output ? O_WRONLY|O_CREAT|O_TRUNC : O_RDONLY;
   int fd, fd2;
@@ -98,43 +95,40 @@ int execute_command(char **args) {
   int inputRedirectIndex = get_arg_index('<', args);
   int backgroundIndex = get_arg_index('&', args);
 
+  // fork the process
   if((pid = fork()) < 0) {
     perror("Error forking child process");
     exit(1);
-  } else if (pid == 0) {
-    if(backgroundIndex < 0) signal(SIGINT, SIG_DFL);
-    if(outputRedirectIndex > 0) {
+  } else if (pid == 0) { //handle the child fork
+    if(backgroundIndex < 0) signal(SIGINT, SIG_DFL);// catch sigint for foreground children
+    if(outputRedirectIndex > 0) { // deal with output redirection
       execute_child(args[outputRedirectIndex + 1], args[outputRedirectIndex - 1], 1);
     }
-    if(inputRedirectIndex > 0) {
+    if(inputRedirectIndex > 0) { // deal with input redirection
       execute_child(args[inputRedirectIndex + 1], args[inputRedirectIndex - 1], 0);
     }
-
-    if(backgroundIndex > 0) {
+    if(backgroundIndex > 0) { // replace the & with a null char
       args[backgroundIndex] = '\0';
     }
-
-    pid = execvp(args[0], args);
-    if(pid < 0) {
+    pid = execvp(args[0], args); // exec the child
+    if(pid < 0) { // deal with any errors
       perror(args[0]);
       exit(1);
     }
-
-  } else {
+  } else { // handle the parent fork
     signal(SIGINT, SIG_IGN);
-    if(backgroundIndex > 0) {
+    if(backgroundIndex > 0) { // handle waiting/message for background child
       wpid = waitpid(pid, &status, WNOHANG);
       printf("background pid is %i\n", pid);
       fflush(stdout);
-    } else {
+    } else { // deal with foreground processes
       do {
         wpid = waitpid(pid, &status, WUNTRACED);
       } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-      if(WIFSIGNALED(status)) print_status(status);
+      if(WIFSIGNALED(status)) print_status(status); // print status if process was killed
     }
   }
-
-  return status;
+  return status; // return the status to main
 }
 
 // execute the input
@@ -146,7 +140,8 @@ int execute(char **args, int status) {
   if (args[0] == NULL) {
    return 0;
   }
-  
+ 
+  // deal with any built-ins
   if (strcmp(args[0], "cd") == 0) {
     return change_directory(args);
   } else if (strcmp(args[0], "exit") == 0) {
@@ -157,7 +152,8 @@ int execute(char **args, int status) {
     print_status(status);
     return 0;
   }
-    
+
+  // run non-built in commands    
   return execute_command(args);
 }
 
@@ -168,8 +164,8 @@ int main() {
   char **args;
   int status, lastChild, pid;
 
-  do {
-    do {
+  do { // loop unil killed by exit command
+    do { // check for background processes that have completed and print info
       pid = waitpid(-1, &status, WNOHANG);
       if(pid > 0) {
         printf("background pid %i is done: ", pid);
@@ -180,9 +176,9 @@ int main() {
 
     printf(": ");
     fflush(stdout);
-    userInput = get_input();
-    args = parse_input(userInput);
-    status = execute(args, status);
+    userInput = get_input(); // get user input
+    args = parse_input(userInput); // parse user input
+    status = execute(args, status); // execute user input
   } while(1);
 
   return 0;
