@@ -12,5 +12,6 @@ int main(int argc, char *args[]) {
     random = rand() % 27;
     printf("%c", ALPHA[random]);
   }
+  printf("\n");
   return 0;
 }
