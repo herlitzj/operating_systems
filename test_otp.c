@@ -36,6 +36,11 @@ void get_ciphertext(char *buffer, int buffer_size, char *plain_location, char *k
     buffer[i] = encrypt_char(plain_ch, key_ch);
     i++;
   }
+
+  // replace the last line break with a null char
+  buffer[i-2] = '\0';
+
+  // close the files
   fclose(p);
   fclose(k);
 }
