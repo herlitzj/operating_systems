@@ -60,8 +60,10 @@ int main(int argc, char *argv[])
   bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
   serv_addr.sin_port = htons(portno);
 
-  if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-    error("ERROR connecting");
+  if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    perror("ERROR connecting");
+    exit(2);
+  }
 
   get_file_text(plain_text, argv[1]);
 
@@ -74,9 +76,17 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  unsigned int length;
+  length = (unsigned int)strlen(plain_text);
+  n = write(sockfd, &length, sizeof(unsigned int));
+  if (n < 0) error("ERROR writing header to socket");
 
   n = write(sockfd, plain_text, strlen(plain_text));
   if (n < 0) error("ERROR writing to socket");
+
+  length = (unsigned int)strlen(key);
+  n = write(sockfd, &length, sizeof(unsigned int));
+  if (n < 0) error("ERROR writing header to socket");
 
   n = write(sockfd, key, strlen(key));
   if (n < 0) error("ERROR writing to socket");

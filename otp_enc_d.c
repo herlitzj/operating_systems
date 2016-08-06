@@ -6,90 +6,109 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-void error(const char *msg) {
-  perror(msg);
-  exit(1);
+void error(const char *msg)
+{
+    perror(msg);
+    exit(1);
 }
 
-void open_socket(int *sockfd) {
-  printf("opening socket\n");
-  *sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) error("ERROR opening socket");
+void read_from_socket(int socket, unsigned int x, void* buffer) {
+  int bytesRead = 0;
+  int result;
+  while (bytesRead < x) {
+    result = read(socket, buffer + bytesRead, x - bytesRead);
+    if (result < 1 ) {
+      error("Error reading from socket");
+    }
+    bytesRead += result;
+  }
 }
 
-void bind_socket(int portno, int sockfd, struct sockaddr_in serv_addr) {
-  printf("binding socket\n");
-  bzero((char *) &serv_addr, sizeof(serv_addr));
-  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-    error("ERROR on binding");
+char encrypt_char(char plain, char key) {
+  char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+  int position = 0;
+  int plain_index = 0, key_index = 0;
+  if(plain == '\n') return plain;
+  if(plain == EOF) return '\0';
+  for(position; position < 28; position++) {
+    if (plain == dictionary[position]) plain_index = position;
+    if (key == dictionary[position]) key_index = position;
+  }
+
+  plain_index = (plain_index + key_index) % 27;
+  return dictionary[plain_index];
 }
 
-void listen_to_socket(int sockfd, int *newsockfd, socklen_t *clilen, struct sockaddr_in cli_addr) {
-  printf("listening to socket\n");
-  listen(sockfd, 5);
-  *clilen = sizeof(cli_addr);
-  *newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  clilen);
-  if (newsockfd < 0) error("ERROR on accept");
-  printf("done setting up listen\n");
+void encrypt(char *plain, int plain_size, char *key) {
+  int i=0;
+  while(plain[i] != EOF) {
+    plain[i] = encrypt_char(plain[i], key[i]);
+    i++;
+  }
+
+  // replace the last line break with a null char
+  plain[i-2] = '\0';
+  
 }
 
-void read_from_socket(int newsockfd, char buffer[], const int BUFFER_SIZE) {
-  printf("reading from socket\n");
-  int n;
-  bzero(buffer, BUFFER_SIZE);
-  n = read(newsockfd, buffer, BUFFER_SIZE - 1);
-  if (n < 0) error("ERROR reading from socket");
-  printf("Here is the message: %s\n", buffer);
-}
-
-void write_to_socket(int newsockfd) {
-  int n;
-  n = write(newsockfd,"I got your message", 18);
-  if (n < 0) error("ERROR writing to socket");
-}
-
-void close_socket(int sockfd, int newsockfd) {
-  printf("closing socket\n");
-  close(newsockfd);
-  close(sockfd);
-}
-
-char *encrypt(char *target_file, char *key_file) {
-
-  //return encrypted_text;
-}
-
-int main(int argc, char *argv[]) {
-  const int BUFFER_SIZE = 512;
+int main(int argc, char *argv[])
+{
   int sockfd, newsockfd, portno;
+  int32_t buffer_size = 1000;
   socklen_t clilen;
-  char buffer[BUFFER_SIZE];
+  //char plain_buffer[buffer_size], key_buffer[buffer_size];
   struct sockaddr_in serv_addr, cli_addr;
+  int n;
+  unsigned int length;
 
-  // verify correct input arguments
   if (argc < 2) {
-    error("ERROR, no port provided\n");
+    fprintf(stderr,"ERROR, no port provided\n");
     exit(1);
   }
 
-  // basic setup of elements
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+  if (sockfd < 0) error("ERROR opening socket");
+
+  bzero((char *) &serv_addr, sizeof(serv_addr));
   portno = atoi(argv[1]);
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(portno);
 
-  open_socket(&sockfd);
-  bind_socket(portno, sockfd, serv_addr);
-  //listen_to_socket(sockfd, &newsockfd, &clilen, cli_addr);
-  printf("listening to socket\n");
+  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+    error("ERROR on binding");
+
   listen(sockfd, 5);
   clilen = sizeof(cli_addr);
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
+  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
-  printf("done setting up listen\n");
-  read_from_socket(newsockfd, buffer, BUFFER_SIZE);
-  write_to_socket(newsockfd);
-  close_socket(sockfd, newsockfd);
+
+/*
+  n = read(newsockfd, plain_buffer, buffer_size - 1);
+  if (n < 0) error("ERROR reading from socket");
+  
+  n = read(newsockfd, key_buffer, buffer_size - 1);
+  if (n < 0) error("ERROR reading from socket");
+
+  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+*/
+
+  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+  char plain_buffer[length];
+  read_from_socket(newsockfd, length, (void*)plain_buffer);
+
+  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+  char key_buffer[length];
+  read_from_socket(newsockfd, length, (void*)key_buffer);
+
+  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+
+  n = write(newsockfd, plain_buffer, strlen(plain_buffer));
+  if (n < 0) error("ERROR writing to socket");
+
+  close(newsockfd);
+  close(sockfd);
 
   return 0; 
 }
