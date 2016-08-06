@@ -67,32 +67,25 @@ int main(int argc, char *argv[])
 
   get_file_text(key, argv[2]);
 
-  printf("Plain text length: %i\n Contents: %s\n", strlen(plain_text), plain_text);
+  printf("Plain text length: %i\nContents: %s\n", strlen(plain_text), plain_text);
+  printf("Key length: %i\nContents: %s\n", strlen(key), key);
+  if(strlen(key) < strlen(plain_text)) {
+    perror("Key is too short");
+    exit(1);
+  }
 
 
-  /*
-  printf("Please enter the message: ");
-  bzero(buffer, buffer_size);
-  fgets(buffer, buffer_size - 1, stdin);
-  n = write(sockfd, buffer, strlen(buffer));
-
+  n = write(sockfd, plain_text, strlen(plain_text));
   if (n < 0) error("ERROR writing to socket");
 
-  printf("Please enter the key: ");
-  bzero(buffer, buffer_size);
-  fgets(buffer, buffer_size - 1, stdin);
-  n = write(sockfd, buffer, strlen(buffer));
-
+  n = write(sockfd, key, strlen(key));
   if (n < 0) error("ERROR writing to socket");
-
-  bzero(buffer, buffer_size);
-  n = read(sockfd, buffer, 7);
-
+  
+  n = read(sockfd, buffer, strlen(plain_text));
   if (n < 0) error("ERROR reading from socket");
 
-  printf("GOT A REPLY %s\n", buffer);
+  printf("Encrypted Text:\n%s\n", buffer);
   close(sockfd);
-  */
   
   return 0;
 }

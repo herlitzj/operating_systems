@@ -80,18 +80,6 @@ int main(int argc, char *argv[])
 
   if (newsockfd < 0) error("ERROR on accept");
 
-  /*int32_t ret;
-  char *data = (char*)&ret;
-  int left = sizeof(ret);
-  int rc;
-  while (left) {
-    ret = read(newsockfd, data + sizeof(ret) - left, left);
-    if (ret < 0) return -1;
-    left -= ret;
-  }
-  buffer_size = ret;
-  printf("Buffer size set to %i\n", buffer_size);
-  */
   bzero(plain_buffer, buffer_size);
   n = read(newsockfd, plain_buffer, buffer_size - 1);
 
@@ -99,8 +87,6 @@ int main(int argc, char *argv[])
 
   if (n < 0) error("ERROR reading from socket");
   
-  printf("Here is the plaintext: %s\n", plain_buffer);
-
   n = read(newsockfd, key_buffer, buffer_size - 1);
 
   if (n < 0) error("ERROR reading from socket");
