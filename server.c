@@ -48,7 +48,8 @@ void encrypt(char *plain, int plain_size, char *key) {
 
 int main(int argc, char *argv[])
 {
-  int sockfd, newsockfd, portno, buffer_size = 1000;
+  int sockfd, newsockfd, portno;
+  int32_t buffer_size = 1000;
   socklen_t clilen;
   char plain_buffer[buffer_size], key_buffer[buffer_size];
   struct sockaddr_in serv_addr, cli_addr;
@@ -78,6 +79,19 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 
   if (newsockfd < 0) error("ERROR on accept");
+
+  /*int32_t ret;
+  char *data = (char*)&ret;
+  int left = sizeof(ret);
+  int rc;
+  while (left) {
+    ret = read(newsockfd, data + sizeof(ret) - left, left);
+    if (ret < 0) return -1;
+    left -= ret;
+  }
+  buffer_size = ret;
+  printf("Buffer size set to %i\n", buffer_size);
+  */
   bzero(plain_buffer, buffer_size);
   n = read(newsockfd, plain_buffer, buffer_size - 1);
 
