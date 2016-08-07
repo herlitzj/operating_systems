@@ -43,7 +43,7 @@ void encrypt(char cipher[], char plain[], int length, char key[]) {
   while(plain[i] != '0') {
     cipher[i] = encrypt_char(plain[i], key[i]);
     printf("ENCRYPTING %c TO %c WITH %c\n", plain[i], cipher[i], key[i]);
-    i++
+    i++;
   }
 
   // replace the last line break with a null char
