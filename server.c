@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   close(newsockfd);
-  close(sockfd);
+  // close(sockfd);
 
   return 0; 
 }
