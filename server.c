@@ -128,8 +128,7 @@ int main(int argc, char *argv[])
   printf("Encrypted message: %s\n", cipher_buffer);
 
   // send header with length of cipher
-  length = strlen(cipher_buffer);
-  n = write(newsockfd, &length, sizeof(length));
+  n = write(newsockfd, &cipher_length, sizeof(cipher_length));
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client
@@ -139,7 +138,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   // write ciphertext to client
-  n = write(newsockfd, cipher_buffer, strlen(cipher_buffer));
+  n = write(newsockfd, cipher_buffer, cipher_length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client
