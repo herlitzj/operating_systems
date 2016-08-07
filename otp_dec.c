@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#define RESPONSE_OK 200
+#define RESPONSE_BAD_REQUEST 400
+#define RESPONSE_INTERNAL_ERROR 500
 #define MAX_MESSAGE_LEN 100000
 #define DEC_HANDSHAKE 12345
 #define USAGE "otp_dec [ciphertext] [key] [port] [&]"
@@ -25,7 +28,7 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
   }
   result = read(socket, message, message_length);
   if (result < 1 ) {
-    read_from_socket(socket, message_length, message, retries++)
+    read_from_socket(socket, message_length, message, retries++);
   }
 }
 
@@ -45,6 +48,7 @@ void get_file_text(char *buffer, char *file_location) {
 }
 
 void intiate_handshake(int socket, int retries) {
+  int n;
   unsigned int handshake = DEC_HANDSHAKE;
   unsigned int response = 0;
 
@@ -59,7 +63,7 @@ void intiate_handshake(int socket, int retries) {
     intiate_handshake(socket, retries++)
   } else {
     // read handshake response from server
-    read_from_socket(socket, sizeof(response), (void *)&response);
+    read_from_socket(socket, sizeof(response), (void *)&response, 0);
     if(response == 400) {
       close(socket)
       error("Connection declined by server\n");
@@ -83,7 +87,7 @@ void send_message(int socket, char *message_buffer, int retries) {
   if (n < 0) error("Error writing to socket\n");
 
   // read response from client
-  read_from_socket(socket, sizeof(response), (void *)&response);
+  read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
     // write plaintext to client
@@ -91,7 +95,7 @@ void send_message(int socket, char *message_buffer, int retries) {
     if (n < 0) error("ERROR writing to socket\n");
 
     // read response from client
-    read_from_socket(socket, sizeof(response), (void *)&response);
+    read_from_socket(socket, sizeof(response), (void *)&response, 0);
   }
 
   if (response == 200) {
@@ -107,7 +111,7 @@ char *get_from_server(int socket) {
   unsigned int response_ok = RESPONSE_OK;
 
   // read header from client with length of message
-  read_from_socket(socket, sizeof(message_length), (void *)&message_length);
+  read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to client
   n = write(socket, &response_ok, sizeof(response_ok));
@@ -166,11 +170,11 @@ int main(int argc, char *argv[])
   intiate_handshake(sockfd, 0); 
 
   // send the ciphertext and key to the server
-  send_message(sockf, plain_text, 0);
-  send_message(sockf, key, 0); 
+  send_message(sockfd, plain_text, 0);
+  send_message(sockfd, key, 0); 
 
   // get the plaintext from the server
-  char *plain_text = get_from_server(sockf);
+  char *plain_text = get_from_server(sockfd);
 
   // print the decrypted message to stdout
   printf("%s\n", plain_text);
