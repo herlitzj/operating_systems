@@ -39,7 +39,7 @@ char encrypt_char(char plain, char key) {
   return dictionary[plain_index];
 }
 
-void encrypt(char* cipher, char *plain, int length, char *key) {
+void encrypt(char cipher[], char *plain, int length, char *key) {
   int i=0;
   for(i; i <= length; i++) {
     cipher[i] = encrypt_char(plain[i], key[i]);
@@ -47,7 +47,7 @@ void encrypt(char* cipher, char *plain, int length, char *key) {
   }
 
   // replace the last line break with a null char
-  cipher[i-2] = '\0';
+  // cipher[i-2] = '\0';
   
 }
 
