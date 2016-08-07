@@ -165,7 +165,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     close(socket);
   } else {
-    send_to_client(socket, message_buffer, retries++)
+    send_to_client(socket, message_buffer, retries++);
   }
 }
 
