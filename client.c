@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
   n = read(sockfd, &response, sizeof(response));
   if (n < 0) error("ERROR reading from socket");
   if (response == 200) printf("SUCCESS\n");
-  else printf("SERVER ERROR\n", );
+  else printf("SERVER ERROR\n");
   printf("RESPONSE: %s\n", buffer);
 
   n = write(sockfd, plain_text, strlen(plain_text));
