@@ -47,7 +47,7 @@ void encrypt(char *plain, int plain_size, char *key) {
   }
 
   // replace the last line break with a null char
-  // plain[i-2] = '\0';
+  plain[i-2] = '\0';
   
 }
 
