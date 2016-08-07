@@ -100,17 +100,14 @@ int main(int argc, char *argv[])
   printf("Recieved plaintext: %s\n", plain_buffer);
 
   // send response to client
-  unsigned int response = 200;
   n = write(newsockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
 
   // get header from client with length of key
-  unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   printf("Recieved length: %i\n", length);
 
   // send response to client
-  unsigned int response = 200;
   n = write(newsockfd, &response, sizeof(response));
 
   // read key from the client
