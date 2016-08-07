@@ -29,7 +29,7 @@ char encrypt_char(char plain, char key) {
 
 void encrypt(char *plain, int plain_size, char *key) {
   int i=0;
-  for(i; i < plain_size, i++) {
+  for(i; i < plain_size; i++) {
     plain[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
 
-  // n = read(newsockfd, plain_buffer, buffer_size - 1);
-  // if (n < 0) error("ERROR reading from socket");
+  n = read(newsockfd, plain_buffer, buffer_size - 1);
+  if (n < 0) error("ERROR reading from socket");
   
   // n = read(newsockfd, key_buffer, buffer_size - 1);
 
@@ -81,8 +81,7 @@ int main(int argc, char *argv[])
 
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
-  // n = write(newsockfd, plain_buffer, strlen(plain_buffer));
-  n = write(newsockfd, "test", 5);
+  n = write(newsockfd, plain_buffer, strlen(plain_buffer));
 
   if (n < 0) error("ERROR writing to socket");
 
