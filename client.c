@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  n = write(sockfd, strlen(plain_text), sizeof(int));
+  n = write(sockfd, (void *)strlen(plain_text), sizeof(int));
   if (n < 0) error("ERROR writing to socket");
 
   n = read(sockfd, buffer, strlen(plain_text));
