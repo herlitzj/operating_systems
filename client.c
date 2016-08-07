@@ -131,14 +131,25 @@ int main(int argc, char *argv[])
   if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
   else printf("RESPONSE: 500 SERVER ERROR\n");
 
-  // read encrypted text from server
+  // read header from server with length of cipher
+  read_from_socket(sockfd, sizeof(length), (void *)&length);
+  printf("Client: Recieved length: %i\n", length);
+
+  // send response to sever
+  response = 200;
+  n = write(sockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
+
+  // read ciphertext from the server
+  char cipher_buffer[length];
+  read_from_socket(sockfd, length, cipher_buffer);
+  printf("Client: Recieved ciphertext: %s\n", cipher_buffer);
 
   // send response to server
-
-  // n = write(sockfd, key, strlen(key));
-  // if (n < 0) error("ERROR writing to socket");
+  response = 200;
+  n = write(sockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
   
-  printf("Encrypted Text:\n%s\n", buffer);
   close(sockfd);
   
   return 0;
