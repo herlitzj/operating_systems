@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   unsigned int response = 200;
   unsigned int bad_request = 400;
   if(length == 54321) n = write(newsockfd, &response, sizeof(response));
-  else n = write(newsockfd, &bad_request, sizeof(bad_request))
+  else n = write(newsockfd, &bad_request, sizeof(bad_request));
   if (n < 0) error("ERROR writing to socket");
   
   // read header from client with length of message
