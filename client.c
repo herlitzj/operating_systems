@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
   n = write(sockfd, plain_text, strlen(plain_text));
   if (n < 0) error("ERROR writing to socket");
 
-  n = write(sockfd, key, strlen(key));
-  if (n < 0) error("ERROR writing to socket");
+  // n = write(sockfd, key, strlen(key));
+  // if (n < 0) error("ERROR writing to socket");
   
   n = read(sockfd, buffer, strlen(plain_text));
   if (n < 0) error("ERROR reading from socket");
