@@ -62,7 +62,7 @@ void verify_client(int socket) {
   if (response == 400) error("BAD REQUEST");
 }
 
-char* get_ciphertext(int socket) {
+char *get_ciphertext(int socket) {
   int n;
   unsigned int message_length = 0;
   unsigned int response_ok = RESPONSE_OK;
@@ -82,10 +82,10 @@ char* get_ciphertext(int socket) {
   n = write(socket, &response_ok, sizeof(response_ok));
   if (n < 0) error("ERROR writing to socket");
 
-  return &cipher_buffer;
+  return cipher_buffer;
 }
 
-char* get_key(int socket) {
+char *get_key(int socket) {
   int n;
   unsigned int message_length = 0;
   unsigned int response_ok = RESPONSE_OK;
