@@ -41,7 +41,7 @@ char decrypt_char(char cipher, char key) {
   return dictionary[cipher_index];
 }
 
-void encrypt(char *cipher, int length, char *key) {
+void decrypt(char *cipher, int length, char *key) {
   int i=0;
   while(cipher[i] != '\0') {
     cipher[i] = decrypt_char(cipher[i], key[i]);
@@ -62,16 +62,81 @@ void verify_client(int socket) {
   if (response == 400) error("BAD REQUEST");
 }
 
-void get_plaintext() {
+char* get_ciphertext(int socket) {
+  unsigned int message_length = 0;
+  unsigned int response_ok = RESPONSE_OK;
+
+  // read header from client with length of cipher
+  read_from_socket(newsockfd, sizeof(message_length), (void *)&message_length);
+
+  // send response to client
+  n = write(newsockfd, &response_ok, sizeof(response_ok));
+  if (n < 0) error("ERROR writing to socket");
+
+  // read cipher from the client
+  char cipher_buffer[message_length];
+  read_from_socket(newsockfd, message_length, cipher_buffer);
+
+  // send response to client
+  n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
+
+  return &cipher_buffer;
+}
+
+char* get_key(int socket) {
+  unsigned int message_length = 0;
+  unsigned int response_ok = RESPONSE_OK;
+
+  // read header from client with length of key
+  read_from_socket(newsockfd, sizeof(message_length), (void *)&message_length);
+
+  // send response to client
+  n = write(newsockfd, &response_ok, sizeof(response_ok));
+  if (n < 0) error("ERROR writing to socket");
+
+  // read key from the client
+  char key_buffer[message_length];
+  read_from_socket(newsockfd, message_length, key_buffer);
+
+  // send response to client
+  n = write(newsockfd, &response_ok, sizeof(response_ok));
+  if (n < 0) error("ERROR writing to socket");
+
+  return &key_buffer;
 
 }
 
-void get_key() {
+void send_plaintext(int socket, char *cipher_buffer) {
+  int n;
+  unsigned int response = 0;
+  unsigned int cipher_length = strlen(cipher_buffer) + 1;
 
-}
+  // send header with length of cipher
+  n = write(newsockfd, &cipher_length, sizeof(cipher_length));
+  if (n < 0) error("ERROR writing to socket");
 
-void send_ciphertext() {
+  // read response from client
+  read_from_socket(newsockfd, sizeof(response), (void *)&response);
+  if (n < 0) error("ERROR reading from socket");
 
+  if (response == 200) {
+    // write ciphertext to client
+    n = write(newsockfd, cipher_buffer, cipher_length);
+    if (n < 0) error("ERROR writing to socket");
+
+    // read response from client
+    read_from_socket(newsockfd, sizeof(response), (void *)&response);
+    if (n < 0) error("ERROR reading from socket");    
+  }
+
+  if (response == 200) {
+    exit(0)
+    close(newsockfd);
+    close(sockfd);
+  } else {
+    error("Error writing buffer to client");
+  }
 }
 
 int main(int argc, char *argv[])
@@ -109,64 +174,15 @@ int main(int argc, char *argv[])
   // read handshake
   verify_client(newsockfd);
 
-  // read header from client with length of cipher
-  unsigned int length = 0;
-  unsigned int response = 0;
-  read_from_socket(newsockfd, sizeof(length), (void *)&length);
-  unsigned int cipher_length = length;
+  // get cipher and key from client
+  char *cipher_buffer = get_ciphertext(newsockfd);
+  char *key_buffer = get_key(newsockfd);
 
-  // send response to client
-  n = write(newsockfd, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
+  // decrypt the cipher
+  decrypt(cipher_buffer, strlen(cipher_buffer) + 1, key_buffer);
 
-  // read cipher from the client
-  char cipher_buffer[length];
-  read_from_socket(newsockfd, length, cipher_buffer);
-
-  // send response to client
-  n = write(newsockfd, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
-
-  // read header from client with length of key
-  read_from_socket(newsockfd, sizeof(length), (void *)&length);
-
-  // send response to client
-  n = write(newsockfd, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
-
-  // read key from the client
-  char key_buffer[length];
-  read_from_socket(newsockfd, length, key_buffer);
-
-  // send response to client
-  n = write(newsockfd, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
-
-  // encrypt message
-  encrypt(cipher_buffer, cipher_length, key_buffer);
-
-  // send header with length of cipher
-  n = write(newsockfd, &cipher_length, sizeof(cipher_length));
-  if (n < 0) error("ERROR writing to socket");
-
-  // read response from client
-  read_from_socket(newsockfd, sizeof(response), (void *)&response);
-  if (n < 0) error("ERROR reading from socket");
-  // if (response == 200) printf("SERVER: %i SUCCESS\n", response);
-  // else printf("RESPONSE: 500 CLIENT ERROR\n");
-
-  // write ciphertext to client
-  n = write(newsockfd, cipher_buffer, cipher_length);
-  if (n < 0) error("ERROR writing to socket");
-
-  // read response from client
-  read_from_socket(newsockfd, sizeof(response), (void *)&response);
-  if (n < 0) error("ERROR reading from socket");
-  // if (response == 200) printf("SERVER: %i SUCCESS\n", response);
-  // else printf("RESPONSE: 500 CLIENT ERROR\n");
-
-  close(newsockfd);
-  close(sockfd);
+  // send the plaintext back to the client
+  send_plaintext(newsockfd, cipher_buffer);
 
   return 0; 
 }
