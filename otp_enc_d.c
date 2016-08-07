@@ -73,7 +73,6 @@ void send_ciphertext() {
 int main(int argc, char *argv[])
 {
   int sockfd, newsockfd, portno;
-  int32_t buffer_size = 1000;
   socklen_t clilen;
   struct sockaddr_in serv_addr, cli_addr;
   int n, m=0;
