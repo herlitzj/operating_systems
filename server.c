@@ -39,15 +39,15 @@ char encrypt_char(char plain, char key) {
   return dictionary[plain_index];
 }
 
-void encrypt(char *plain, int plain_size, char *key) {
+void encrypt(char* cipher, char *plain, int length, char *key) {
   int i=0;
-  for(i; i < plain_size; i++) {
-    plain[i] = encrypt_char(plain[i], key[i]);
+  for(i; i <= length; i++) {
+    cipher[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
 
   // replace the last line break with a null char
-  plain[i-2] = '\0';
+  cipher[i-2] = '\0';
   
 }
 
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
   // read header from client with length of message
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
+  unsigned int cipher_length = length;
   printf("Recieved length: %i\n", length);
 
   // send response to client
@@ -119,7 +120,8 @@ int main(int argc, char *argv[])
   n = write(newsockfd, &response, sizeof(response));
 
   // encrypt message
-  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+  char cipher_buffer[cipher_length]
+  encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
   printf("Encrypted message: %s\n", plain_buffer);
 
   // send header with length of plaintext
