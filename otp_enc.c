@@ -49,6 +49,7 @@ void get_file_text(char *buffer, char *file_location) {
 }
 
 void intiate_handshake(int socket, int retries) {
+  printf("HANDSHAKE");
   int n;
   unsigned int handshake = ENC_HANDSHAKE;
   unsigned int response = 0;
@@ -74,6 +75,7 @@ void intiate_handshake(int socket, int retries) {
 }
 
 void send_message(int socket, char *message_buffer, int retries) {
+  printf("SENDING MESSAGE");
   int n;
   unsigned int response = 0;
   unsigned int message_length = strlen(message_buffer) + 1;
@@ -100,6 +102,7 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 
   if (response == 200) {
+    printf("MESSAGE SENT SUCCESSFULLY");  
     close(socket);
   } else {
     send_message(socket, message_buffer, retries++);
