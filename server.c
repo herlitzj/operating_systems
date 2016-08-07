@@ -84,18 +84,18 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
 
-  int length;
-  read_from_socket(newsockfd, sizeof(int), &length);
+  unsigned int length;
+  read_from_socket(newsockfd, sizeof(unsigned int), &length);
   printf("LEN: %i\n", length);
-  char plain_buffer[length];
-  read_from_socket(newsockfd, length, plain_buffer);
-  printf("BOD: %s\n", plain_buffer);
+  // char plain_buffer[length];
+  // read_from_socket(newsockfd, length, plain_buffer);
+  // printf("BOD: %s\n", plain_buffer);
 
-  read_from_socket(newsockfd, sizeof(int), &length);
-  printf("LEN: %i\n", length);
-  char key_buffer[length];
-  read_from_socket(newsockfd, length, key_buffer);
-  printf("BOD: %s\n", key_buffer);
+  // read_from_socket(newsockfd, sizeof(int), &length);
+  // printf("LEN: %i\n", length);
+  // char key_buffer[length];
+  // read_from_socket(newsockfd, length, key_buffer);
+  // printf("BOD: %s\n", key_buffer);
 
   // n = read(newsockfd, plain_buffer, buffer_size - 1);
   // if (n < 0) error("ERROR reading from socket");
@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
   n = write(newsockfd, plain_buffer, strlen(plain_buffer));
+  n = write(newsockfd, "test", 4);
 
   if (n < 0) error("ERROR writing to socket");
 
