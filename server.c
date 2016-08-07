@@ -29,7 +29,6 @@ char encrypt_char(char plain, char key) {
   int position = 0;
   int plain_index = 0, key_index = 0;
   if(plain == '\n') return plain;
-  if(plain == EOF) return '\0';
   for(position; position < 28; position++) {
     if (plain == dictionary[position]) plain_index = position;
     if (key == dictionary[position]) key_index = position;
@@ -41,10 +40,10 @@ char encrypt_char(char plain, char key) {
 
 void encrypt(char cipher[], char plain[], int length, char key[]) {
   int i=0;
-  for(i; i <= length; i++) {
+  while(plain[i] != '0') {
     cipher[i] = encrypt_char(plain[i], key[i]);
     printf("ENCRYPTING %c TO %c WITH %c\n", plain[i], cipher[i], key[i]);
-    printf("ENCRYPTING %i TO %i WITH %i\n", plain[i], cipher[i], key[i]);
+    i++
   }
 
   // replace the last line break with a null char
