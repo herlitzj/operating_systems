@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
   if(response == 400) error("Connnection declined by server");
 
   // send header with length of plaintext
-  unsigned int length = 0;
   length = strlen(plain_text) + 1;
   n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");

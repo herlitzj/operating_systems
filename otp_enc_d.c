@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
   if (n < 0) error("ERROR writing to socket");
   
   // read header from client with length of message
-  unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
 
