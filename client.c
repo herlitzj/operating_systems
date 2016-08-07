@@ -105,14 +105,31 @@ int main(int argc, char *argv[])
   if (n < 0) error("ERROR writing to socket");
 
   // read response from server
+  read_from_socket(sockfd, sizeof(response), (void *)&response);
+  if (n < 0) error("ERROR reading from socket");
+  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write length of key to server
+  length = strlen(key);
+  n = write(sockfd, &length, sizeof(length));
+  if (n < 0) error("ERROR writing to socket");
 
   // read response from server
+  read_from_socket(sockfd, sizeof(response), (void *)&response);
+  if (n < 0) error("ERROR reading from socket");
+  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write key to server
+  n = write(sockfd, key, strlen(key));
+  if (n < 0) error("ERROR writing to socket");
 
   // read response from server
+  read_from_socket(sockfd, sizeof(response), (void *)&response);
+  if (n < 0) error("ERROR reading from socket");
+  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // read encrypted text from server
 

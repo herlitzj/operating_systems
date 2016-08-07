@@ -87,32 +87,44 @@ int main(int argc, char *argv[])
   // get header from client with length of message
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
-  printf("LEN: %i\n", length);
+  printf("Recieved length: %i\n", length);
 
   // send response to client
   unsigned int response = 200;
   n = write(newsockfd, &response, sizeof(response));
-  // char plain_buffer[length];
-  // read_from_socket(newsockfd, length, plain_buffer);
-  // printf("BOD: %s\n", plain_buffer);
-
-  // read_from_socket(newsockfd, sizeof(int), &length);
-  // printf("LEN: %i\n", length);
-  // char key_buffer[length];
-  // read_from_socket(newsockfd, length, key_buffer);
-  // printf("BOD: %s\n", key_buffer);
-
-  // n = read(newsockfd, plain_buffer, buffer_size - 1);
-  // if (n < 0) error("ERROR reading from socket");
-  
-  // n = read(newsockfd, key_buffer, buffer_size - 1);
-  // if (n < 0) error("ERROR reading from socket");
-
-  // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
-
-  // n = write(newsockfd, plain_buffer, strlen(plain_buffer));
-
   if (n < 0) error("ERROR writing to socket");
+
+  // read plaintext from the client
+  char plain_buffer[length];
+  read_from_socket(newsockfd, length, plain_buffer);
+  printf("Recieved plaintext: %s\n", plain_buffer);
+
+  // send response to client
+  unsigned int response = 200;
+  n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
+
+  // get header from client with length of key
+  unsigned int length = 0;
+  read_from_socket(newsockfd, sizeof(length), (void *)&length);
+  printf("Recieved length: %i\n", length);
+
+  // send response to client
+  unsigned int response = 200;
+  n = write(newsockfd, &response, sizeof(response));
+
+  // read key from the client
+  char key_buffer[length];
+  read_from_socket(newsockfd, length, key_buffer);
+  printf("Recieved key: %s\n", key_buffer);
+
+  // encrypt message
+  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+  printf("Encrypted message: %s\n", plain_buffer);
+
+  // write encrypted message to client
+
+  // read response from client
 
   close(newsockfd);
   close(sockfd);
