@@ -142,7 +142,7 @@ void send_plaintext(int socket, char *cipher_buffer) {
 int main(int argc, char *argv[])
 {
   pid_t pid, wpid;
-  int sockfd, newsockfd, portno;
+  int sockfd, newsockfd, portno, status;
   socklen_t clilen;
   struct sockaddr_in serv_addr, cli_addr;
   int n, m=0;
@@ -172,8 +172,7 @@ int main(int argc, char *argv[])
   if (newsockfd < 0) error("ERROR on accept");
 
   if((pid = fork()) < 0) {
-    perror("Error forking child process");
-    exit(1);
+    error("Error forking child process");
   } else if (pid == 0) { //handle the child fork
     // read handshake
     verify_client(newsockfd);
@@ -193,15 +192,10 @@ int main(int argc, char *argv[])
     free(key_buffer);
     
   } else { // handle the parent fork
-    signal(SIGINT, SIG_IGN);
-    if(backgroundIndex > 0) { // handle waiting/message for background child
-      wpid = waitpid(pid, &status, WNOHANG);
-    } else { // deal with foreground processes
-      do {
-        wpid = waitpid(pid, &status, WUNTRACED);
-      } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-      if(WIFSIGNALED(status)) print_status(status); // print status if process was killed
-    }
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    if(WIFSIGNALED(status)) print_status(status); // print status if process was killed
   }
   
   // exit(0); 
