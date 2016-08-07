@@ -85,16 +85,16 @@ int main(int argc, char *argv[])
   if (newsockfd < 0) error("ERROR on accept");
 
   int length;
-  read_from_socket(newsockfd, sizeof(int), (void*)(&length));
+  read_from_socket(newsockfd, sizeof(int), &length);
   printf("LEN: %i\n", length);
   char plain_buffer[length];
-  read_from_socket(newsockfd, length, (void*)plain_buffer);
+  read_from_socket(newsockfd, length, plain_buffer);
   printf("BOD: %s\n", plain_buffer);
 
-  read_from_socket(newsockfd, sizeof(int), (void*)(&length));
+  read_from_socket(newsockfd, sizeof(int), &length);
   printf("LEN: %i\n", length);
   char key_buffer[length];
-  read_from_socket(newsockfd, length, (void*)key_buffer);
+  read_from_socket(newsockfd, length, key_buffer);
   printf("BOD: %s\n", key_buffer);
 
   // n = read(newsockfd, plain_buffer, buffer_size - 1);
