@@ -142,6 +142,10 @@ int main(int argc, char *argv[])
   n = write(sockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
   
+  printf("%s\n", plain_text);
+  printf("%s\n", key);
+  printf("%s\n", cipher_buffer);
+  
   close(sockfd);
   
   return 0;
