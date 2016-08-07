@@ -79,7 +79,7 @@ char* get_ciphertext(int socket) {
   read_from_socket(socket, message_length, cipher_buffer);
 
   // send response to client
-  n = write(socket, &response, sizeof(response));
+  n = write(socket, &response_ok, sizeof(response_ok));
   if (n < 0) error("ERROR writing to socket");
 
   return &cipher_buffer;
@@ -105,7 +105,7 @@ char* get_key(int socket) {
   n = write(socket, &response_ok, sizeof(response_ok));
   if (n < 0) error("ERROR writing to socket");
 
-  return &key_buffer;
+  return key_buffer;
 
 }
 
@@ -133,7 +133,7 @@ void send_plaintext(int socket, char *cipher_buffer) {
   }
 
   if (response == 200) {
-    close(newsockfd);
+    close(socket);
   } else {
     error("Error writing buffer to client");
   }
