@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     // send the plaintext back to the client
     send_plaintext(newsockfd, cipher_buffer);
 
-    close(sockfd);
+    close(newsockfd);
     free(cipher_buffer);
     free(key_buffer);
     
