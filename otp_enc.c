@@ -90,6 +90,16 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  // send handshake
+  unsigned int length = 54321;
+  n = write(sockfd, &length, sizeof(length));
+  if (n < 0) error("ERROR writing to socket");
+
+  // read handshake response from server
+  unsigned int response = 0;
+  read_from_socket(sockfd, sizeof(response), (void *)&response);
+  if(response == 400) error("Connnection declined by server");
+
   // send header with length of plaintext
   unsigned int length = 0;
   length = strlen(plain_text) + 1;
