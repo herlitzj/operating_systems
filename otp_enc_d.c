@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -65,12 +66,10 @@ void encrypt(char *plain, int plain_size, char *key) {
 
 int main(int argc, char *argv[])
 {
-  int sockfd, newsockfd, portno;
-  int32_t buffer_size = 1000;
+  int sockfd, newsockfd, portno, n, length, status;
+  pid_t pid, wpid;
   socklen_t clilen;
   struct sockaddr_in serv_addr, cli_addr;
-  int n;
-  int length;
 
   if (argc < 2) {
     fprintf(stderr,"ERROR, no port provided\n");
@@ -95,27 +94,42 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
 
-  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
-  printf("LEN: %i\n", length);
-  char plain_buffer[length];
-  read_from_socket(newsockfd, length, (void*)plain_buffer);
-  printf("BOD: %s\n", plain_buffer);
+  // fork the process
+  if((pid = fork()) < 0) {
+    perror("Error forking child process");
+    exit(1);
+  } else if (pid == 0) { //handle the child fork
+    read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+    printf("LEN: %i\n", length);
+    char plain_buffer[length];
+    read_from_socket(newsockfd, length, (void*)plain_buffer);
+    printf("BOD: %s\n", plain_buffer);
 
-  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
-  printf("LEN: %i\n", length);
-  char key_buffer[length];
-  read_from_socket(newsockfd, length, (void*)key_buffer);
-  printf("BOD: %s\n", key_buffer);
+    read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+    printf("LEN: %i\n", length);
+    char key_buffer[length];
+    read_from_socket(newsockfd, length, (void*)key_buffer);
+    printf("BOD: %s\n", key_buffer);
 
-  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
-  printf("ENC: %s\n", plain_buffer);
+    encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+    printf("ENC: %s\n", plain_buffer);
 
-  length = strlen(plain_buffer);
-  write_to_socket(newsockfd, sizeof(length), (void*)(&length));
-  write_to_socket(newsockfd, length, (void*)plain_buffer);
+    // write_to_socket(newsockfd, sizeof(length), (void*)(&length));
+    // write_to_socket(newsockfd, length, (void*)plain_buffer);
 
-  close(newsockfd);
-  close(sockfd);
+    printf("S SEND LEN: %i\n", length);
+    length = strlen(plain_buffer);
+    n = write(newsockfd, &length, sizeof(int));
+    n = write(newsockfd, plain_buffer, length);
+    if (n < 0) error("ERROR writing to socket");
+  
+  } else { // handle the parent fork
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));  
+    close(newsockfd);
+    close(sockfd);
+  }
 
   return 0; 
 }

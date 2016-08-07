@@ -102,31 +102,32 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  length = strlen(plain_text);
-  printf("WLEN: %i\n", length);
-  write_to_socket(sockfd, sizeof(length), (void*)(&length));
-  write_to_socket(sockfd, length, (void*)plain_text);
-  printf("WBOD: %s\n", plain_text);
-
-  length = strlen(key);
-  printf("WLEN: %i\n", length);
-  write_to_socket(sockfd, sizeof(length), (void*)(&length));
-  write_to_socket(sockfd, length, (void*)key);
-  printf("WBOD: %s\n", key);
-
-
-  // n = write(sockfd, &length, sizeof(int));
-  // if (n < 1) error("ERROR writing header to socket");
-
-  // n = write(sockfd, plain_text, strlen(plain_text));
-  // if (n < 1) error("ERROR writing to socket");
+  // length = strlen(plain_text);
+  // printf("WLEN: %i\n", length);
+  // write_to_socket(sockfd, sizeof(length), (void*)(&length));
+  // write_to_socket(sockfd, length, (void*)plain_text);
+  // printf("WBOD: %s\n", plain_text);
 
   // length = strlen(key);
-  // n = write(sockfd, &length, sizeof(int));
-  // if (n < 1) error("ERROR writing header to socket");
+  // printf("WLEN: %i\n", length);
+  // write_to_socket(sockfd, sizeof(length), (void*)(&length));
+  // write_to_socket(sockfd, length, (void*)key);
+  // printf("WBOD: %s\n", key);
 
-  // n = write(sockfd, key, strlen(key));
-  // if (n < 1) error("ERROR writing to socket");
+
+  length = strlen(plain_text);
+  n = write(sockfd, &length, sizeof(int));
+  if (n < 1) error("ERROR writing header to socket");
+
+  n = write(sockfd, plain_text, strlen(plain_text));
+  if (n < 1) error("ERROR writing to socket");
+
+  length = strlen(key);
+  n = write(sockfd, &length, sizeof(int));
+  if (n < 1) error("ERROR writing header to socket");
+
+  n = write(sockfd, key, strlen(key));
+  if (n < 1) error("ERROR writing to socket");
   
   read_from_socket(sockfd, sizeof(length), (void*)(&length));
   char encrypted_buffer[length];
