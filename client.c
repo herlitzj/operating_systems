@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write key to server
-  n = write(sockfd, key, length;
+  n = write(sockfd, key, length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from server
