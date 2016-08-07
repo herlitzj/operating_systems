@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   n = write(newsockfd, &response, sizeof(response));
 
   // encrypt message
-  char cipher_buffer[cipher_length]
+  char cipher_buffer[cipher_length];
   encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
   printf("Encrypted message: %s\n", plain_buffer);
 
