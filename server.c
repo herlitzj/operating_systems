@@ -29,18 +29,13 @@ char encrypt_char(char plain, char key) {
 
 void encrypt(char *plain, int plain_size, char *key) {
   int i=0;
-  while(plain[i] != EOF) {
-    //if(key[i] < 0) {
-    //  perror("Key too short");
-    //  exit(1);
-    //}
-
+  for(i; i < plain_size, i++) {
     plain[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
 
   // replace the last line break with a null char
-  plain[i-2] = '\0';
+  // plain[i-2] = '\0';
   
 }
 
