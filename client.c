@@ -138,9 +138,6 @@ int main(int argc, char *argv[])
   // n = write(sockfd, key, strlen(key));
   // if (n < 0) error("ERROR writing to socket");
   
-  n = read(sockfd, buffer, strlen(plain_text));
-  if (n < 0) error("ERROR reading from socket");
-
   printf("Encrypted Text:\n%s\n", buffer);
   close(sockfd);
   
