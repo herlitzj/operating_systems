@@ -117,8 +117,8 @@ int main(int argc, char *argv[])
   // read response from client
   read_from_socket(newsockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("SERVER: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 CLIENT ERROR\n");
+  // if (response == 200) printf("SERVER: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   // write ciphertext to client
   n = write(newsockfd, plain_buffer, cipher_length);
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
   // read response from client
   read_from_socket(newsockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("SERVER: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 CLIENT ERROR\n");
+  // if (response == 200) printf("SERVER: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   close(newsockfd);
   close(sockfd);

@@ -100,8 +100,8 @@ int main(int argc, char *argv[])
   unsigned int response = 0;
   read_from_socket(sockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 SERVER ERROR\n");
+  // if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write plaintext to server
   n = write(sockfd, plain_text, length);
@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
   // read response from server
   read_from_socket(sockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 SERVER ERROR\n");
+  // if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write length of key to server
   length = strlen(key) + 1;
@@ -121,8 +121,8 @@ int main(int argc, char *argv[])
   // read response from server
   read_from_socket(sockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 SERVER ERROR\n");
+  // if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write key to server
   n = write(sockfd, key, length);
@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
   // read response from server
   read_from_socket(sockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
-  else printf("RESPONSE: 500 SERVER ERROR\n");
+  // if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  // else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // read header from server with length of cipher
   read_from_socket(sockfd, sizeof(length), (void *)&length);
@@ -151,8 +151,6 @@ int main(int argc, char *argv[])
   n = write(sockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
 
-  printf("%s\n", plain_text);
-  printf("%s\n", key);
   printf("%s\n", cipher_buffer);
   
   close(sockfd);
