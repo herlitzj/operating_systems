@@ -20,7 +20,7 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   while (bytes_read < x) {
     result = read(socket, buffer + bytes_read, x - bytes_read);
     if (result < 1 ) {
-      error("Error reading from socket");
+      error("Client Error: cannot read from socket");
     }
     bytes_read += result;
   }
