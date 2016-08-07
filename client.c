@@ -87,20 +87,36 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  // send header with length of plaintext
   unsigned int length = 0;
   length = strlen(plain_text);
   n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
 
+  // read response from server
   unsigned int response = 0;
-  n = read(sockfd, &response, sizeof(response));
+  read_from_socket(newsockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
-  if (response == 200) printf("SUCCESS\n");
-  else printf("SERVER ERROR\n");
-  printf("RESPONSE: %s\n", buffer);
+  if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
+  else printf("RESPONSE: 500 SERVER ERROR\n");
 
+  // write plaintext to server
   n = write(sockfd, plain_text, strlen(plain_text));
   if (n < 0) error("ERROR writing to socket");
+
+  // read response from server
+
+  // write length of key to server
+
+  // read response from server
+
+  // write key to server
+
+  // read response from server
+
+  // read encrypted text from server
+
+  // send response to server
 
   // n = write(sockfd, key, strlen(key));
   // if (n < 0) error("ERROR writing to socket");

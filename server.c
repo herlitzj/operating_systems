@@ -8,8 +8,8 @@
 
 void error(const char *msg)
 {
-    perror(msg);
-    exit(1);
+  perror(msg);
+  exit(1);
 }
 
 void read_from_socket(int socket, unsigned int x, void* buffer) {
@@ -83,10 +83,13 @@ int main(int argc, char *argv[])
   clilen = sizeof(cli_addr);
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
-
+  
+  // get header from client with length of message
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   printf("LEN: %i\n", length);
+
+  // send response to client
   unsigned int response = 200;
   n = write(newsockfd, &response, sizeof(response));
   // char plain_buffer[length];
