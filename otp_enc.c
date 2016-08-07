@@ -103,7 +103,6 @@ void send_message(int socket, char *message_buffer, int retries) {
 
   if (response == 200) {
     printf("MESSAGE SENT SUCCESSFULLY");  
-    close(socket);
   } else {
     send_message(socket, message_buffer, retries++);
   }
