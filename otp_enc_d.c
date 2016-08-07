@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sockfd < 0) error("ERROR opening socket");
+  if (sockfd < 0) error("Error opening socket\n");
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
   portno = atoi(argv[1]);
@@ -185,15 +185,14 @@ int main(int argc, char *argv[]) {
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(portno);
 
-  if (bind(sockfd, (struct sockaddr *) &serv_addr,
-    sizeof(serv_addr)) < 0) 
-    error("ERROR on binding");
+  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+    error("Error on binding\n");
 
   while(1) {
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) error("ERROR on accept");
+    if (newsockfd < 0) error("ERROR on accept\n");
 
     if((pid = fork()) < 0) {
       error("Error forking child process");

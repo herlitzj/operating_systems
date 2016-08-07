@@ -48,6 +48,7 @@ void get_file_text(char *buffer, char *file_location) {
 }
 
 void intiate_handshake(int socket, int retries) {
+  int n;
   unsigned int handshake = ENC_HANDSHAKE;
   unsigned int response = 0;
 
@@ -62,7 +63,7 @@ void intiate_handshake(int socket, int retries) {
     intiate_handshake(socket, retries++)
   } else {
     // read handshake response from server
-    read_from_socket(socket, sizeof(response), (void *)&response);
+    read_from_socket(socket, sizeof(response), (void *)&response, 0);
     if(response == 400) {
       close(socket)
       error("Connection declined by server\n");
@@ -86,7 +87,7 @@ void send_message(int socket, char *message_buffer, int retries) {
   if (n < 0) error("Error writing to socket\n");
 
   // read response from client
-  read_from_socket(socket, sizeof(response), (void *)&response);
+  read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
     // write plaintext to client
@@ -94,7 +95,7 @@ void send_message(int socket, char *message_buffer, int retries) {
     if (n < 0) error("ERROR writing to socket\n");
 
     // read response from client
-    read_from_socket(socket, sizeof(response), (void *)&response);
+    read_from_socket(socket, sizeof(response), (void *)&response, 0);
   }
 
   if (response == 200) {
@@ -110,7 +111,7 @@ char *get_from_server(int socket) {
   unsigned int response_ok = RESPONSE_OK;
 
   // read header from client with length of message
-  read_from_socket(socket, sizeof(message_length), (void *)&message_length);
+  read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to client
   n = write(socket, &response_ok, sizeof(response_ok));
@@ -118,7 +119,7 @@ char *get_from_server(int socket) {
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
-  read_from_socket(socket, message_length, temp_buffer);
+  read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send OK response to client
   n = write(socket, &response_ok, sizeof(response_ok));
