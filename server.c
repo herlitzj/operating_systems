@@ -42,13 +42,8 @@ void encrypt(char cipher[], char plain[], int length, char key[]) {
   int i=0;
   while(plain[i] != '\0') {
     cipher[i] = encrypt_char(plain[i], key[i]);
-    printf("ENCRYPTING %c TO %c WITH %c\n", plain[i], cipher[i], key[i]);
     i++;
   }
-
-  // replace the last line break with a null char
-  // cipher[i-2] = '\0';
-  
 }
 
 int main(int argc, char *argv[])
@@ -56,7 +51,6 @@ int main(int argc, char *argv[])
   int sockfd, newsockfd, portno;
   int32_t buffer_size = 1000;
   socklen_t clilen;
-  // char plain_buffer[buffer_size], key_buffer[buffer_size];
   struct sockaddr_in serv_addr, cli_addr;
   int n, m=0;
 
@@ -126,6 +120,8 @@ int main(int argc, char *argv[])
   char cipher_buffer[cipher_length];
   encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
   printf("Encrypted message: %s\n", cipher_buffer);
+  printf("Encrypted message length: %i\n", cipher_length);
+  printf("Encrypted message length2: %i\n", strlen(cipher_buffer));
 
   // send header with length of cipher
   n = write(newsockfd, &cipher_length, sizeof(cipher_length));
