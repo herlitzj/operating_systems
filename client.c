@@ -90,7 +90,6 @@ int main(int argc, char *argv[])
   // send header with length of plaintext
   unsigned int length = 0;
   length = strlen(plain_text);
-  unsigned int cipher_length = length;
   n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
 
@@ -142,8 +141,9 @@ int main(int argc, char *argv[])
   if (n < 0) error("ERROR writing to socket");
 
   // read ciphertext from the server
-  char cipher_buffer[cipher_length];
-  read_from_socket(sockfd, cipher_length, cipher_buffer);
+  char cipher_buffer[length];
+  bzero(cipher_buffer, MAX_MESSAGE_LEN);
+  read_from_socket(sockfd, length, buffer);
   printf("Client: Recieved ciphertext: %s\n  //END OF MESSAGE//\n", cipher_buffer);
 
   // send response to server
