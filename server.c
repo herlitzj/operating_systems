@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
   printf("Recieved length: %i\n", length);
+  printf("Set cipher length: %i\n", cipher_length);
 
   // send response to client
   unsigned int response = 200;
@@ -110,6 +111,7 @@ int main(int argc, char *argv[])
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
 
   // read key from the client
   char key_buffer[length];
@@ -118,13 +120,14 @@ int main(int argc, char *argv[])
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
 
   // encrypt message
   char cipher_buffer[cipher_length];
   encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
-  printf("Encrypted message: %s\n", plain_buffer);
+  printf("Encrypted message: %s\n", cipher_buffer);
 
-  // send header with length of plaintext
+  // send header with length of cipher
   length = strlen(cipher_buffer);
   n = write(newsockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
