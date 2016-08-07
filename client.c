@@ -144,7 +144,8 @@ int main(int argc, char *argv[])
   char cipher_buffer[length];
   bzero(cipher_buffer, MAX_MESSAGE_LEN);
   read_from_socket(sockfd, length, buffer);
-  printf("Client: Recieved ciphertext: %s\n  //END OF MESSAGE//\n", cipher_buffer);
+  printf("Client: Recieved ciphertext: %s\n", cipher_buffer);
+  printf("Client: Ciphertext length: %i\n", strlen(cipher_buffer));
 
   // send response to server
   response = 200;
