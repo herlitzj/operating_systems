@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 
   // read ciphertext from the server
   char cipher_buffer[length];
-  read_from_socket(sockfd, length, buffer);
+  read_from_socket(sockfd, length, cipher_buffer);
   printf("Client: Recieved ciphertext: %s\n", cipher_buffer);
   printf("Client: Ciphertext length: %i\n", strlen(cipher_buffer));
 
