@@ -139,10 +139,10 @@ char *get_from_client(int socket) {
 
 // }
 
-void send_to_client(int socket, char *plain_buffer, int retries) {
+void send_to_client(int socket, char *message_buffer, int retries) {
   int n;
   unsigned int response = 0;
-  unsigned int message_length = strlen(plain_buffer) + 1;
+  unsigned int message_length = strlen(message_buffer) + 1;
 
   if(retries > 5) {
     close(socket);
@@ -158,7 +158,7 @@ void send_to_client(int socket, char *plain_buffer, int retries) {
 
   if (response == 200) {
     // write plaintext to client
-    n = write(socket, plain_buffer, message_length);
+    n = write(socket, message_buffer, message_length);
     if (n < 0) error("ERROR writing to socket\n");
 
     // read response from client
@@ -168,7 +168,7 @@ void send_to_client(int socket, char *plain_buffer, int retries) {
   if (response == 200) {
     close(socket);
   } else {
-    send_to_client(socket, plain_buffer, retries++);
+    send_to_client(socket, message_buffer, retries++);
   }
 }
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
       decrypt(cipher_to_plain_buffer, strlen(cipher_to_plain_buffer) + 1, key_buffer);
 
       // send the plaintext back to the client
-      send_to_client(newsockfd, cipher_to_plain_buffer);
+      send_to_client(newsockfd, cipher_to_plain_buffer, 0);
 
       // free memory
       free(cipher_to_plain_buffer);

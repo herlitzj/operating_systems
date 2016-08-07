@@ -136,10 +136,15 @@ char *get_from_client(int socket) {
 
 // }
 
-void send_to_client(int socket, char *cipher_buffer) {
+void send_to_client(int socket, char *message_buffer, int retries) {
   int n;
   unsigned int response = 0;
-  unsigned int message_length = strlen(cipher_buffer) + 1;
+  unsigned int message_length = strlen(message_buffer) + 1;
+
+  if(retries > 5) {
+    close(socket);
+    error("Error sending message to client. Too many failed attempts\n");
+  }
 
   // send header with length of cipher
   n = write(socket, &message_length, sizeof(message_length));
@@ -150,7 +155,7 @@ void send_to_client(int socket, char *cipher_buffer) {
 
   if (response == 200) {
     // write ciphertext to client
-    n = write(socket, cipher_buffer, message_length);
+    n = write(socket, message_buffer, message_length);
     if (n < 0) error("ERROR writing to socket");
 
     // read response from client
@@ -160,7 +165,7 @@ void send_to_client(int socket, char *cipher_buffer) {
   if (response == 200) {
     close(socket);
   } else {
-    error("Error writing buffer to client");
+    send_to_client(socket, message_buffer, retries++)
   }
 }
 
@@ -208,7 +213,7 @@ int main(int argc, char *argv[]) {
       encrypt(plain_to_cipher_buffer, strlen(plain_to_cipher_buffer) + 1, key_buffer);
 
       // send the cipher back to the client
-      send_to_client(newsockfd, plain_to_cipher_buffer);
+      send_to_client(newsockfd, plain_to_cipher_buffer, 0);
 
       // free memory
       free(plain_to_cipher_buffer);

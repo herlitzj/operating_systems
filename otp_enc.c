@@ -65,7 +65,7 @@ void intiate_handshake(int socket, int retries) {
     // read handshake response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
     if(response == 400) {
-      close(socket)
+      close(socket);
       error("Connection declined by server\n");
     }
   }
