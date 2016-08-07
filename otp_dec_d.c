@@ -75,7 +75,7 @@ char *get_ciphertext(int socket) {
   if (n < 0) error("ERROR writing to socket");
 
   // read cipher from the client
-  char cipher_buffer[message_length];
+  char *cipher_buffer = malloc(sizeof (char) *message_length)
   read_from_socket(socket, message_length, cipher_buffer);
 
   // send response to client
@@ -98,7 +98,7 @@ char *get_key(int socket) {
   if (n < 0) error("ERROR writing to socket");
 
   // read key from the client
-  char key_buffer[message_length];
+  char *key_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, key_buffer);
 
   // send response to client
@@ -185,5 +185,7 @@ int main(int argc, char *argv[])
   send_plaintext(newsockfd, cipher_buffer);
 
   close(sockfd);
+  free(cipher_buffer);
+  free(key_buffer);
   exit(0); 
 }
