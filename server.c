@@ -12,6 +12,18 @@ void error(const char *msg)
     exit(1);
 }
 
+void read_from_socket(int socket, int x, void* buffer) {
+  int bytes_read = 0;
+  int result;
+  while (bytes_read < x) {
+    result = read(socket, buffer + bytes_read, x - bytes_read);
+    if (result < 1 ) {
+      error("Error reading from socket");
+    }
+    bytes_read += result;
+  }
+}
+
 char encrypt_char(char plain, char key) {
   char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
   int position = 0;
@@ -72,11 +84,23 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
 
-  n = read(newsockfd, plain_buffer, buffer_size - 1);
-  if (n < 0) error("ERROR reading from socket");
+  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+  printf("LEN: %i\n", length);
+  char plain_buffer[length];
+  read_from_socket(newsockfd, length, (void*)plain_buffer);
+  printf("BOD: %s\n", plain_buffer);
+
+  read_from_socket(newsockfd, sizeof(length), (void*)(&length));
+  printf("LEN: %i\n", length);
+  char key_buffer[length];
+  read_from_socket(newsockfd, length, (void*)key_buffer);
+  printf("BOD: %s\n", key_buffer);
+
+  // n = read(newsockfd, plain_buffer, buffer_size - 1);
+  // if (n < 0) error("ERROR reading from socket");
   
-  n = read(newsockfd, key_buffer, buffer_size - 1);
-  if (n < 0) error("ERROR reading from socket");
+  // n = read(newsockfd, key_buffer, buffer_size - 1);
+  // if (n < 0) error("ERROR reading from socket");
 
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
