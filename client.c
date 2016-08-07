@@ -74,6 +74,12 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  n = write(sockfd, strlen(plain_text), sizeof(int));
+  if (n < 0) error("ERROR writing to socket");
+
+  n = read(sockfd, buffer, strlen(plain_text));
+  if (n < 0) error("ERROR reading from socket");
+  printf("RESPONSE: %s\n", buffer);
 
   n = write(sockfd, plain_text, strlen(plain_text));
   if (n < 0) error("ERROR writing to socket");

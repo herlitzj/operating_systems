@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   printf("LEN: %i\n", length);
+  n = write(newsockfd, "200", 3);
   // char plain_buffer[length];
   // read_from_socket(newsockfd, length, plain_buffer);
   // printf("BOD: %s\n", plain_buffer);
@@ -106,7 +107,6 @@ int main(int argc, char *argv[])
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
   // n = write(newsockfd, plain_buffer, strlen(plain_buffer));
-  n = write(newsockfd, "test", 4);
 
   if (n < 0) error("ERROR writing to socket");
 
