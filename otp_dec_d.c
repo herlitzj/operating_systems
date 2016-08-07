@@ -20,24 +20,28 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   }
 }
 
-char encrypt_char(char plain, char key) {
+char decrypt_char(char cipher, char key) {
   char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
   int position = 0;
-  int plain_index = 0, key_index = 0;
-  if(plain == '\n') return plain;
+  int cipher_index = 0, key_index = 0;
+  if(cipher == '\n') return cipher;
+  if(cipher == EOF) return '\0';
   for(position; position < 28; position++) {
-    if (plain == dictionary[position]) plain_index = position;
+    if (cipher == dictionary[position]) cipher_index = position;
     if (key == dictionary[position]) key_index = position;
   }
 
-  plain_index = (plain_index + key_index) % 27;
-  return dictionary[plain_index];
+  //deal with C's crappy modulo
+  cipher_index = cipher_index  - key_index;
+  if(cipher_index < 0) cipher_index = 27 + cipher_index;
+
+  return dictionary[cipher_index];
 }
 
-void encrypt(char *plain, int length, char *key) {
+void encrypt(char *cipher, int length, char *key) {
   int i=0;
-  while(plain[i] != '\0') {
-    plain[i] = encrypt_char(plain[i], key[i]);
+  while(cipher[i] != '\0') {
+    cipher[i] = decrypt_char(cipher[i], key[i]);
     i++;
   }
 }
@@ -74,7 +78,7 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
   
-  // read header from client with length of message
+  // read header from client with length of cipher
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
@@ -84,9 +88,9 @@ int main(int argc, char *argv[])
   n = write(newsockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
 
-  // read plaintext from the client
-  char plain_buffer[length];
-  read_from_socket(newsockfd, length, plain_buffer);
+  // read cipher from the client
+  char cipher_buffer[length];
+  read_from_socket(newsockfd, length, cipher_buffer);
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
@@ -108,7 +112,7 @@ int main(int argc, char *argv[])
   if (n < 0) error("ERROR writing to socket");
 
   // encrypt message
-  encrypt(plain_buffer, cipher_length, key_buffer);
+  encrypt(cipher_buffer, cipher_length, key_buffer);
 
   // send header with length of cipher
   n = write(newsockfd, &cipher_length, sizeof(cipher_length));
@@ -121,7 +125,7 @@ int main(int argc, char *argv[])
   // else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   // write ciphertext to client
-  n = write(newsockfd, plain_buffer, cipher_length);
+  n = write(newsockfd, cipher_buffer, cipher_length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client

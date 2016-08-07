@@ -22,15 +22,6 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   }
 }
 
-void validate_plaintext(char *buffer, int length) {
-  int i;
-  for(i = 0; i < length; i++) {
-    if((buffer[i] < 'A' || buffer[i] > 'Z') && buffer[i] != '\n' && buffer[i] != '\0' && buffer[i] != ' ') {
-      error("Message invalid");
-    }
-  }
-}
-
 void get_file_text(char *buffer, char *file_location) {
   FILE *f = fopen(file_location, "r");
   if (f != NULL) {
