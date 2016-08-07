@@ -166,32 +166,34 @@ int main(int argc, char *argv[])
     sizeof(serv_addr)) < 0) 
     error("ERROR on binding");
 
-  listen(sockfd, 5);
-  clilen = sizeof(cli_addr);
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-  if (newsockfd < 0) error("ERROR on accept");
+  while(1) {
+    listen(sockfd, 5);
+    clilen = sizeof(cli_addr);
+    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0) error("ERROR on accept");
 
-  if((pid = fork()) < 0) {
-    error("Error forking child process");
-  } else if (pid == 0) { //handle the child fork
-    // read handshake
-    verify_client(newsockfd);
+    if((pid = fork()) < 0) {
+      error("Error forking child process");
+    } else if (pid == 0) { //handle the child fork
+      // read handshake
+      verify_client(newsockfd);
 
-    // get cipher and key from client
-    char *cipher_buffer = get_ciphertext(newsockfd);
-    char *key_buffer = get_key(newsockfd);
+      // get cipher and key from client
+      char *cipher_buffer = get_ciphertext(newsockfd);
+      char *key_buffer = get_key(newsockfd);
 
-    // decrypt the cipher
-    decrypt(cipher_buffer, strlen(cipher_buffer) + 1, key_buffer);
+      // decrypt the cipher
+      decrypt(cipher_buffer, strlen(cipher_buffer) + 1, key_buffer);
 
-    // send the plaintext back to the client
-    send_plaintext(newsockfd, cipher_buffer);
+      // send the plaintext back to the client
+      send_plaintext(newsockfd, cipher_buffer);
 
-    free(cipher_buffer);
-    free(key_buffer);
-    
-  } else { // handle the parent fork
-    close(newsockfd);
+      free(cipher_buffer);
+      free(key_buffer);
+      
+    } else { // handle the parent fork
+      close(newsockfd);
+    }
   }
   
   // exit(0); 
