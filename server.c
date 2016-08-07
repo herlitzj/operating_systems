@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
-  n = write(newsockfd, plain_buffer, strlen(plain_buffer));
+  // n = write(newsockfd, plain_buffer, strlen(plain_buffer));
   n = write(newsockfd, "test", 4);
 
   if (n < 0) error("ERROR writing to socket");
