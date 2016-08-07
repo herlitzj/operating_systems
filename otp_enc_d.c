@@ -91,7 +91,6 @@ int main(int argc, char *argv[])
   unsigned int cipher_length = length;
 
   // send response to client
-  unsigned int response = 200;
   n = write(newsockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
 
