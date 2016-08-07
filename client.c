@@ -22,6 +22,7 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
     if (result < 1 ) {
       error("Client Error: cannot read from socket");
     }
+    printf("CLIENT BUFFER CONTENTS: %s\n", buffer);
     bytes_read += result;
   }
 }
