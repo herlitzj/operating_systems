@@ -73,7 +73,6 @@ int main(int argc, char *argv[])
     error("ERROR connecting");
 
   get_file_text(plain_text, argv[1]);
-  validate_plaintext(plain_text, strlen(plain_text));
   get_file_text(key, argv[2]);
 
   if(strlen(key) < strlen(plain_text)) {
