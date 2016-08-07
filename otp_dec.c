@@ -60,7 +60,7 @@ void intiate_handshake(int socket, int retries) {
   // send handshake
   n = write(socket, &handshake, sizeof(handshake));
   if (n < 0) {
-    intiate_handshake(socket, retries++)
+    intiate_handshake(socket, retries++);
   } else {
     // read handshake response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -119,7 +119,7 @@ char *get_from_server(int socket) {
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
-  read_from_socket(socket, message_length, temp_buffer);
+  read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send OK response to client
   n = write(socket, &response_ok, sizeof(response_ok));
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
   intiate_handshake(sockfd, 0); 
 
   // send the ciphertext and key to the server
-  send_message(sockfd, plain_text, 0);
+  send_message(sockfd, cipher_text, 0);
   send_message(sockfd, key, 0); 
 
   // get the plaintext from the server

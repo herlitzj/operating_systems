@@ -60,7 +60,7 @@ void intiate_handshake(int socket, int retries) {
   // send handshake
   n = write(socket, &handshake, sizeof(handshake));
   if (n < 0) {
-    intiate_handshake(socket, retries++)
+    intiate_handshake(socket, retries++);
   } else {
     // read handshake response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
   int sockfd, portno, n, buffer_size = 1000;
   struct sockaddr_in serv_addr;
   struct hostent *server;
-  char cipher_text[MAX_MESSAGE_LEN];
+  char plain_text[MAX_MESSAGE_LEN];
   char key[MAX_MESSAGE_LEN];
 
   if (argc < 4) {
@@ -159,10 +159,10 @@ int main(int argc, char *argv[])
     error("ERROR connecting\n");
 
   // read the files (ciphertext and key) into buffers for sending
-  get_file_text(cipher_text, argv[1]);
+  get_file_text(plain_text, argv[1]);
   get_file_text(key, argv[2]);
 
-  if(strlen(key) < strlen(cipher_text)) {
+  if(strlen(key) < strlen(plain_text)) {
     error("Key is too short\n");
   }
 
@@ -174,12 +174,12 @@ int main(int argc, char *argv[])
   send_message(sockfd, key, 0); 
 
   // get the plaintext from the server
-  char *plain_text = get_from_server(sockfd);
+  char *cipher_text = get_from_server(sockfd);
 
   // print the decrypted message to stdout
-  printf("%s\n", plain_text);
+  printf("%s\n", cipher_text);
 
-  free(plain_text);
+  free(cipher_text);
   close(sockfd);
   
   return 0;
