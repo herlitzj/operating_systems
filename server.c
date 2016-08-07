@@ -70,21 +70,16 @@ int main(int argc, char *argv[])
   listen(sockfd, 5);
   clilen = sizeof(cli_addr);
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
   if (newsockfd < 0) error("ERROR on accept");
 
-  bzero(plain_buffer, buffer_size);
   n = read(newsockfd, plain_buffer, buffer_size - 1);
-
-  if(strcmp(plain_buffer, "exit") == 0) m = -1;
-
   if (n < 0) error("ERROR reading from socket");
   
-  n = read(newsockfd, key_buffer, buffer_size - 1);
+  // n = read(newsockfd, key_buffer, buffer_size - 1);
 
-  if (n < 0) error("ERROR reading from socket");
+  // if (n < 0) error("ERROR reading from socket");
 
-  encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
+  // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
   n = write(newsockfd, plain_buffer, strlen(plain_buffer));
 
