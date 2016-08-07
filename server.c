@@ -124,8 +124,9 @@ int main(int argc, char *argv[])
 
   // encrypt message
   char cipher_buffer[cipher_length];
+  bzero(cipher_buffer, cipher_length);
   encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
-  printf("Encrypted message: %s\n", cipher_buffer);
+  printf("Encrypted message: %s\n //END OF MESSAGE//", cipher_buffer);
 
   // send header with length of cipher
   n = write(newsockfd, &cipher_length, sizeof(cipher_length));
