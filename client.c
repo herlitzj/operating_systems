@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
   // read response from server
   unsigned int response = 0;
-  read_from_socket(newsockfd, sizeof(response), (void *)&response);
+  read_from_socket(sockfd, sizeof(response), (void *)&response);
   if (n < 0) error("ERROR reading from socket");
   if (response == 200) printf("RESPONSE: %i SUCCESS\n", response);
   else printf("RESPONSE: 500 SERVER ERROR\n");
