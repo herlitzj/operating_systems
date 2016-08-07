@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   int sockfd, newsockfd, portno;
   int32_t buffer_size = 1000;
   socklen_t clilen;
-  char plain_buffer[buffer_size], key_buffer[buffer_size];
+  // char plain_buffer[buffer_size], key_buffer[buffer_size];
   struct sockaddr_in serv_addr, cli_addr;
   int n, m=0;
 
