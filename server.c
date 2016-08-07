@@ -115,6 +115,9 @@ int main(int argc, char *argv[])
   read_from_socket(newsockfd, length, key_buffer);
   printf("Recieved key: %s\n", key_buffer);
 
+  // send response to client
+  n = write(newsockfd, &response, sizeof(response));
+
   // encrypt message
   encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
   printf("Encrypted message: %s\n", plain_buffer);
