@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
   // send header with length of plaintext
   unsigned int length = 0;
-  length = strlen(plain_text);
+  length = strlen(plain_text) + 1;
   n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
 
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write plaintext to server
-  n = write(sockfd, plain_text, strlen(plain_text));
+  n = write(sockfd, plain_text, length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from server
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write length of key to server
-  length = strlen(key);
+  length = strlen(key) + 1;
   n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 SERVER ERROR\n");
 
   // write key to server
-  n = write(sockfd, key, strlen(key));
+  n = write(sockfd, key, length;
   if (n < 0) error("ERROR writing to socket");
 
   // read response from server

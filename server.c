@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   // write ciphertext to client
-  n = write(newsockfd, plain_buffer, strlen(plain_buffer));
+  n = write(newsockfd, plain_buffer, cipher_length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client
