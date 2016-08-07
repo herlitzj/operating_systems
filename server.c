@@ -75,9 +75,8 @@ int main(int argc, char *argv[])
   n = read(newsockfd, plain_buffer, buffer_size - 1);
   if (n < 0) error("ERROR reading from socket");
   
-  // n = read(newsockfd, key_buffer, buffer_size - 1);
-
-  // if (n < 0) error("ERROR reading from socket");
+  n = read(newsockfd, key_buffer, buffer_size - 1);
+  if (n < 0) error("ERROR reading from socket");
 
   // encrypt(plain_buffer, strlen(plain_buffer), key_buffer);
 
