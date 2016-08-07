@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
 
   get_file_text(key, argv[2]);
 
-  // printf("Plain text length: %d\nContents: %s\n", strlen(plain_text), plain_text);
-  // printf("Key length: %d\nContents: %s\n", strlen(key), key);
+  printf("Plain text length: %d\nContents: %s\n", strlen(plain_text), plain_text);
+  printf("Key length: %d\nContents: %s\n", strlen(key), key);
   if(strlen(key) < strlen(plain_text)) {
     perror("Key is too short");
     exit(1);
