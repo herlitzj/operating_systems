@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
   struct sockaddr_in serv_addr;
   struct hostent *server;
   char buffer[buffer_size];
-  char plain_text[2048];
-  char key[2048];
+  char plain_text[MAX_MESSAGE_LEN];
+  char key[MAX_MESSAGE_LEN];
 
   if (argc < 4) {
     fprintf(stderr, "usage: %s [plaintext file] [key file] [port number]\n", argv[0]);
