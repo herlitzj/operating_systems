@@ -103,17 +103,11 @@ int main(int argc, char *argv[])
   if (newsockfd < 0) error("ERROR on accept");
 
   // read handshake
-  unsigned int length = 0;
-  read_from_socket(newsockfd, sizeof(length), (void *)&length);
-
-  // send response to client
-  unsigned int response = 200;
-  unsigned int bad_request = 400;
-  if(length == 54321) n = write(newsockfd, &response, sizeof(response));
-  else n = write(newsockfd, &bad_request, sizeof(bad_request));
-  if (n < 0) error("ERROR writing to socket");
+  verify_client(newsockfd);
   
   // read header from client with length of message
+  unsigned int length = 0;
+  unsigned int response = 200;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
 

@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
 
   // read header from client with length of cipher
   unsigned int length = 0;
+  unsigned int response = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
 
