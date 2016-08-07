@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
   newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
   if (newsockfd < 0) error("ERROR on accept");
 
-  unsigned int length;
-  read_from_socket(newsockfd, sizeof(unsigned int), (void *)&length);
+  unsigned int length = 0;
+  read_from_socket(newsockfd, sizeof(length), (void *)&length);
   printf("LEN: %i\n", length);
   // char plain_buffer[length];
   // read_from_socket(newsockfd, length, plain_buffer);
