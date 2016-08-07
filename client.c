@@ -22,6 +22,15 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   }
 }
 
+void validate_plaintext(char *buffer, int length) {
+  int i;
+  for(i = 0; i < length; i++) {
+    if((buffer[i] < 'A' || buffer[i] > 'Z') && buffer[i] != '\n' && buffer[i] != '\0') {
+      error("Message invalid")
+    }
+  }
+}
+
 void get_file_text(char *buffer, char *file_location) {
   FILE *f = fopen(file_location, "r");
   if (f != NULL) {
@@ -73,7 +82,7 @@ int main(int argc, char *argv[])
     error("ERROR connecting");
 
   get_file_text(plain_text, argv[1]);
-
+  validate_plaintext(plain_text, strlen(plain_text));
   get_file_text(key, argv[2]);
 
   if(strlen(key) < strlen(plain_text)) {
@@ -141,7 +150,7 @@ int main(int argc, char *argv[])
   response = 200;
   n = write(sockfd, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
-  
+
   printf("%s\n", plain_text);
   printf("%s\n", key);
   printf("%s\n", cipher_buffer);
