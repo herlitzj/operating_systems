@@ -109,13 +109,13 @@ char *get_key(int socket) {
 
 }
 
-void send_plaintext(int socket, char *cipher_buffer) {
+void send_plaintext(int socket, char *plain_buffer) {
   int n;
   unsigned int response = 0;
-  unsigned int cipher_length = strlen(cipher_buffer) + 1;
+  unsigned int message_length = strlen(plain_buffer) + 1;
 
-  // send header with length of cipher
-  n = write(socket, &cipher_length, sizeof(cipher_length));
+  // send header with length of message
+  n = write(socket, &message_length, sizeof(message_length));
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client
@@ -123,8 +123,8 @@ void send_plaintext(int socket, char *cipher_buffer) {
   if (n < 0) error("ERROR reading from socket");
 
   if (response == 200) {
-    // write ciphertext to client
-    n = write(socket, cipher_buffer, cipher_length);
+    // write plaintext to client
+    n = write(socket, plain_buffer, message_length);
     if (n < 0) error("ERROR writing to socket");
 
     // read response from client
@@ -139,8 +139,7 @@ void send_plaintext(int socket, char *cipher_buffer) {
   }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   pid_t pid, wpid;
   int sockfd, newsockfd, portno, status;
   socklen_t clilen;
@@ -179,22 +178,21 @@ int main(int argc, char *argv[])
       verify_client(newsockfd);
 
       // get cipher and key from client
-      char *cipher_buffer = get_ciphertext(newsockfd);
+      char *cipher_to_plain_buffer = get_ciphertext(newsockfd);
       char *key_buffer = get_key(newsockfd);
 
       // decrypt the cipher
-      decrypt(cipher_buffer, strlen(cipher_buffer) + 1, key_buffer);
+      decrypt(cipher_to_plain_buffer, strlen(cipher_to_plain_buffer) + 1, key_buffer);
 
       // send the plaintext back to the client
-      send_plaintext(newsockfd, cipher_buffer);
+      send_plaintext(newsockfd, cipher_to_plain_buffer);
 
-      free(cipher_buffer);
+      // free memory
+      free(cipher_to_plain_buffer);
       free(key_buffer);
       
     } else { // handle the parent fork
       close(newsockfd);
     }
   }
-  
-  // exit(0); 
 }
