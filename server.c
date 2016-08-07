@@ -41,10 +41,10 @@ char encrypt_char(char plain, char key) {
 
 void encrypt(char cipher[], char plain[], int length, char key[]) {
   int i=0;
-  while(plain[i] != EOF) {
+  for(i; i <= length; i++) {
     cipher[i] = encrypt_char(plain[i], key[i]);
     printf("ENCRYPTING %c TO %c WITH %c\n", plain[i], cipher[i], key[i]);
-    i++;
+    printf("ENCRYPTING %i TO %i WITH %i\n", plain[i], cipher[i], key[i]);
   }
 
   // replace the last line break with a null char
