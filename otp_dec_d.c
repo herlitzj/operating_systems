@@ -166,14 +166,14 @@ int main(int argc, char *argv[])
     sizeof(serv_addr)) < 0) 
     error("ERROR on binding");
 
-  listen(sockfd, 5);
-  clilen = sizeof(cli_addr);
-  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-  if (newsockfd < 0) error("ERROR on accept");
 
   if((pid = fork()) < 0) {
     error("Error forking child process");
   } else if (pid == 0) { //handle the child fork
+    listen(sockfd, 5);
+    clilen = sizeof(cli_addr);
+    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0) error("ERROR on accept");
     // read handshake
     verify_client(newsockfd);
 
