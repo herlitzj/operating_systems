@@ -12,7 +12,7 @@ void error(const char *msg)
     exit(1);
 }
 
-void read_from_socket(int socket, int x, void* buffer) {
+void read_from_socket(int socket, unsigned int x, void* buffer) {
   int bytes_read = 0;
   int result;
   while (bytes_read < x) {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
   if (newsockfd < 0) error("ERROR on accept");
 
   unsigned int length;
-  read_from_socket(newsockfd, sizeof(unsigned int), &length);
+  read_from_socket(newsockfd, sizeof(unsigned int), (void *)&length);
   printf("LEN: %i\n", length);
   // char plain_buffer[length];
   // read_from_socket(newsockfd, length, plain_buffer);
