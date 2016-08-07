@@ -14,7 +14,7 @@
 #define USAGE "otp_enc [plaintext] [key] [port] [&]"
 
 void error(const char *msg) {
-  perror("Client: ")
+  perror("Client: ");
   perror(msg);
   exit(1);
 }
