@@ -26,7 +26,7 @@ void validate_plaintext(char *buffer, int length) {
   int i;
   for(i = 0; i < length; i++) {
     if((buffer[i] < 'A' || buffer[i] > 'Z') && buffer[i] != '\n' && buffer[i] != '\0') {
-      error("Message invalid")
+      error("Message invalid");
     }
   }
 }
