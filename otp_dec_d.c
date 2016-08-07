@@ -53,13 +53,13 @@ void verify_client(int socket) {
   int n;
   unsigned int entry_key, response;
 
-  read_from_socket(newsockfd, sizeof(entry_key), (void *)&entry_key);
+  read_from_socket(socket, sizeof(entry_key), (void *)&entry_key);
 
   response = entry_key == 12345 ? RESPONSE_OK : RESPONSE_BAD_REQUEST;
   
-  n = write(newsockfd, &response, sizeof(response));
+  n = write(socket, &response, sizeof(response));
   if (n < 0) error("ERROR writing to socket");
-  if (response == 400) exit("BAD REQUEST");
+  if (response == 400) error("BAD REQUEST");
 }
 
 void get_plaintext() {
