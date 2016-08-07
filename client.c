@@ -8,23 +8,23 @@
 #include <netdb.h> 
 #define MAX_MESSAGE_LEN 100000
 
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
+void error(const char *msg) {
+  perror(msg);
+  exit(1);
 }
 
 void read_from_socket(int socket, unsigned int x, void* buffer) {
   int bytes_read = 0;
   int result;
-  while (bytes_read < x) {
-    result = read(socket, buffer + bytes_read, x - bytes_read);
-    if (result < 1 ) {
-      error("Client Error: cannot read from socket");
-    }
-    printf("CLIENT BUFFER CONTENTS: %s\n", buffer);
-    bytes_read += result;
+  result = read(socket, buffer, x);
+  if (result < 1 ) {
+    error("Server Error: Cannot read from socket");
   }
+  printf("CLIENT BUFFER CONTENTS: %s\n", buffer);
+  // while (bytes_read < x) {
+  //   result = read(socket, buffer + bytes_read, x - bytes_read);
+  //   bytes_read += result;
+  // }
 }
 
 void get_file_text(char *buffer, char *file_location) {
