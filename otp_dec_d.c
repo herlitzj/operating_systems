@@ -195,7 +195,6 @@ int main(int argc, char *argv[])
     do {
       wpid = waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-    if(WIFSIGNALED(status)) print_status(status); // print status if process was killed
   }
   
   // exit(0); 
