@@ -5,6 +5,9 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#define RESPONSE_OK 200
+#define RESPONSE_BAD_REQUEST 400
+#define RESPONSE_INTERNAL_ERROR 500
 
 void error(const char *msg) {
   perror(msg);
@@ -46,6 +49,31 @@ void encrypt(char *cipher, int length, char *key) {
   }
 }
 
+void verify_client(int socket) {
+  int n;
+  unsigned int entry_key, response;
+
+  read_from_socket(newsockfd, sizeof(entry_key), (void *)&entry_key);
+
+  response = entry_key == 12345 ? RESPONSE_OK : RESPONSE_BAD_REQUEST;
+  
+  n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
+  if (response == 400) exit("BAD REQUEST");
+}
+
+void get_plaintext() {
+
+}
+
+void get_key() {
+
+}
+
+void send_ciphertext() {
+
+}
+
 int main(int argc, char *argv[])
 {
   int sockfd, newsockfd, portno;
@@ -79,17 +107,10 @@ int main(int argc, char *argv[])
   if (newsockfd < 0) error("ERROR on accept");
   
   // read handshake
-  unsigned int length = 0;
-  read_from_socket(newsockfd, sizeof(length), (void *)&length);
-
-  // send response to client
-  unsigned int response = 200;
-  unsigned int bad_request = 400;
-  if(length == 12345) n = write(newsockfd, &response, sizeof(response));
-  else n = write(newsockfd, &bad_request, sizeof(bad_request));
-  if (n < 0) error("ERROR writing to socket");
+  verify_client(newsockfd);
 
   // read header from client with length of cipher
+  unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
 

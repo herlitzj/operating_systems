@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   // read handshake response from server
   unsigned int response = 0;
   read_from_socket(sockfd, sizeof(response), (void *)&response);
-  if(response == 400) error("Connnection declined by server");
+  if(response == 400) error("Connection declined by server");
 
   // send header with length of plaintext
   length = strlen(plain_text) + 1;

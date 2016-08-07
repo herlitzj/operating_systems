@@ -5,6 +5,9 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#define RESPONSE_OK 200
+#define RESPONSE_BAD_REQUEST 400
+#define RESPONSE_INTERNAL_ERROR 500
 
 void error(const char *msg) {
   perror(msg);
@@ -40,6 +43,31 @@ void encrypt(char *plain, int length, char *key) {
     plain[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
+}
+
+void verify_client(int socket) {
+  int n;
+  unsigned int entry_key, response;
+
+  read_from_socket(newsockfd, sizeof(entry_key), (void *)&entry_key);
+
+  response = entry_key == 54321 ? RESPONSE_OK : RESPONSE_BAD_REQUEST;
+  
+  n = write(newsockfd, &response, sizeof(response));
+  if (n < 0) error("ERROR writing to socket");
+  if (response == 400) exit("BAD REQUEST");
+}
+
+void get_plaintext() {
+
+}
+
+void get_key() {
+
+}
+
+void send_ciphertext() {
+
 }
 
 int main(int argc, char *argv[])
