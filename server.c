@@ -44,7 +44,6 @@ void encrypt(char cipher[], char plain[], int length, char key[]) {
     cipher[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
-  cipher[i] = '\0';
 }
 
 int main(int argc, char *argv[])
@@ -118,11 +117,10 @@ int main(int argc, char *argv[])
   if (n < 0) error("ERROR writing to socket");
 
   // encrypt message
-  char cipher_buffer[cipher_length];
-  encrypt(cipher_buffer, plain_buffer, cipher_length, key_buffer);
-  printf("Encrypted message: %s\n", cipher_buffer);
+  encrypt(plain_buffer, cipher_length, key_buffer);
+  printf("Encrypted message: %s\n", plain_buffer);
   printf("Encrypted message length: %i\n", cipher_length);
-  printf("Encrypted message length2: %i\n", strlen(cipher_buffer));
+  printf("Encrypted message length2: %i\n", strlen(plain_buffer));
 
   // send header with length of cipher
   n = write(newsockfd, &cipher_length, sizeof(cipher_length));
@@ -135,7 +133,7 @@ int main(int argc, char *argv[])
   else printf("RESPONSE: 500 CLIENT ERROR\n");
 
   // write ciphertext to client
-  n = write(newsockfd, cipher_buffer, cipher_length);
+  n = write(newsockfd, plain_buffer, cipher_length);
   if (n < 0) error("ERROR writing to socket");
 
   // read response from client
