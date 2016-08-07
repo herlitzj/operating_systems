@@ -12,6 +12,7 @@
 #define USAGE "otp_enc_d [port] [&]"
 
 void error(const char *msg) {
+  perror("Server: ")
   perror(msg);
   exit(1);
 }
@@ -148,7 +149,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
 
   // send header with length of cipher
   n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("ERROR writing to socket");
+  if (n < 0) error("Error writing to socket\n");
 
   // read response from client
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -156,7 +157,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     // write ciphertext to client
     n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket");
+    if (n < 0) error("Error writing to socket\n");
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);

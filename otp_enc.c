@@ -14,6 +14,7 @@
 #define USAGE "otp_enc [plaintext] [key] [port] [&]"
 
 void error(const char *msg) {
+  perror("Client: ")
   perror(msg);
   exit(1);
 }
@@ -86,15 +87,15 @@ void send_message(int socket, char *message_buffer, int retries) {
   n = write(socket, &message_length, sizeof(message_length));
   if (n < 0) error("Error writing to socket\n");
 
-  // read response from client
+  // read response from server
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
-    // write plaintext to client
+    // write plaintext to sever
     n = write(socket, message_buffer, message_length);
     if (n < 0) error("ERROR writing to socket\n");
 
-    // read response from client
+    // read response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
   }
 
@@ -110,18 +111,18 @@ char *get_from_server(int socket) {
   unsigned int message_length = 0;
   unsigned int response_ok = RESPONSE_OK;
 
-  // read header from client with length of message
+  // read header from server with length of message
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
-  // send OK response to client
+  // send OK response to server
   n = write(socket, &response_ok, sizeof(response_ok));
   if (n < 0) error("ERROR writing to socket\n");
 
-  // read message from the client
+  // read message from the server
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
-  // send OK response to client
+  // send OK response to server
   n = write(socket, &response_ok, sizeof(response_ok));
   if (n < 0) error("ERROR writing to socket\n");
 
@@ -147,7 +148,7 @@ int main(int argc, char *argv[])
   server = gethostbyname("localhost");
 
   if (server == NULL) {
-    error("ERROR, no such host\n");
+    error("Error, no such host\n");
   }
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
   serv_addr.sin_port = htons(portno);
 
   if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-    error("ERROR connecting\n");
+    error("Error connecting\n");
 
   // read the files (ciphertext and key) into buffers for sending
   get_file_text(plain_text, argv[1]);
