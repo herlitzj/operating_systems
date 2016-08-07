@@ -20,11 +20,6 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   if (result < 1 ) {
     error("Server Error: Cannot read from socket");
   }
-  printf("CLIENT BUFFER CONTENTS: %s\n", buffer);
-  // while (bytes_read < x) {
-  //   result = read(socket, buffer + bytes_read, x - bytes_read);
-  //   bytes_read += result;
-  // }
 }
 
 void get_file_text(char *buffer, char *file_location) {
@@ -81,8 +76,6 @@ int main(int argc, char *argv[])
 
   get_file_text(key, argv[2]);
 
-  printf("Plain text length: %d\nContents: %s\n", strlen(plain_text), plain_text);
-  printf("Key length: %d\nContents: %s\n", strlen(key), key);
   if(strlen(key) < strlen(plain_text)) {
     perror("Key is too short");
     exit(1);
@@ -134,7 +127,6 @@ int main(int argc, char *argv[])
 
   // read header from server with length of cipher
   read_from_socket(sockfd, sizeof(length), (void *)&length);
-  printf("Client: Recieved length: %i\n", length);
 
   // send response to sever
   response = 200;
@@ -144,8 +136,6 @@ int main(int argc, char *argv[])
   // read ciphertext from the server
   char cipher_buffer[length];
   read_from_socket(sockfd, length, cipher_buffer);
-  printf("Client: Recieved ciphertext: %s\n", cipher_buffer);
-  printf("Client: Ciphertext length: %i\n", strlen(cipher_buffer));
 
   // send response to server
   response = 200;

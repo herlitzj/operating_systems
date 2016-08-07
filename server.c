@@ -18,11 +18,6 @@ void read_from_socket(int socket, unsigned int x, void* buffer) {
   if (result < 1 ) {
     error("Server Error: Cannot read from socket");
   }
-  printf("SERVER BUFFER CONTENTS: %s\n", buffer);
-  // while (bytes_read < x) {
-  //   result = read(socket, buffer + bytes_read, x - bytes_read);
-  //   bytes_read += result;
-  // }
 }
 
 char encrypt_char(char plain, char key) {
@@ -83,8 +78,6 @@ int main(int argc, char *argv[])
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   unsigned int cipher_length = length;
-  printf("Recieved length: %i\n", length);
-  printf("Set cipher length: %i\n", cipher_length);
 
   // send response to client
   unsigned int response = 200;
@@ -94,7 +87,6 @@ int main(int argc, char *argv[])
   // read plaintext from the client
   char plain_buffer[length];
   read_from_socket(newsockfd, length, plain_buffer);
-  printf("Recieved plaintext: %s\n", plain_buffer);
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
@@ -102,7 +94,6 @@ int main(int argc, char *argv[])
 
   // read header from client with length of key
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
-  printf("Recieved length: %i\n", length);
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
@@ -111,7 +102,6 @@ int main(int argc, char *argv[])
   // read key from the client
   char key_buffer[length];
   read_from_socket(newsockfd, length, key_buffer);
-  printf("Recieved key: %s\n", key_buffer);
 
   // send response to client
   n = write(newsockfd, &response, sizeof(response));
@@ -119,9 +109,6 @@ int main(int argc, char *argv[])
 
   // encrypt message
   encrypt(plain_buffer, cipher_length, key_buffer);
-  printf("Encrypted message: %s\n", plain_buffer);
-  printf("Encrypted message length: %i\n", cipher_length);
-  printf("Encrypted message length2: %i\n", strlen(plain_buffer));
 
   // send header with length of cipher
   n = write(newsockfd, &cipher_length, sizeof(cipher_length));
