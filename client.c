@@ -7,10 +7,23 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #define MAX_MESSAGE_LEN 100000
+
 void error(const char *msg)
 {
     perror(msg);
-    exit(0);
+    exit(1);
+}
+
+void read_from_socket(int socket, unsigned int x, void* buffer) {
+  int bytes_read = 0;
+  int result;
+  while (bytes_read < x) {
+    result = read(socket, buffer + bytes_read, x - bytes_read);
+    if (result < 1 ) {
+      error("Error reading from socket");
+    }
+    bytes_read += result;
+  }
 }
 
 void get_file_text(char *buffer, char *file_location) {
@@ -76,11 +89,14 @@ int main(int argc, char *argv[])
 
   unsigned int length = 0;
   length = strlen(plain_text);
-  n = write(sockfd, &length, sizeof(int));
+  n = write(sockfd, &length, sizeof(length));
   if (n < 0) error("ERROR writing to socket");
 
-  n = read(sockfd, buffer, strlen(plain_text));
+  unsigned int response = 0;
+  n = read(sockfd, &response, sizeof(response));
   if (n < 0) error("ERROR reading from socket");
+  if (response == 200) printf("SUCCESS\n");
+  else printf("SERVER ERROR\n", );
   printf("RESPONSE: %s\n", buffer);
 
   n = write(sockfd, plain_text, strlen(plain_text));

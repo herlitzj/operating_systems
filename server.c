@@ -87,7 +87,8 @@ int main(int argc, char *argv[])
   unsigned int length = 0;
   read_from_socket(newsockfd, sizeof(length), (void *)&length);
   printf("LEN: %i\n", length);
-  n = write(newsockfd, "200", 3);
+  unsigned int response = 200;
+  n = write(newsockfd, &response, sizeof(response));
   // char plain_buffer[length];
   // read_from_socket(newsockfd, length, plain_buffer);
   // printf("BOD: %s\n", plain_buffer);
