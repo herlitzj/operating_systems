@@ -166,14 +166,14 @@ int main(int argc, char *argv[])
     sizeof(serv_addr)) < 0) 
     error("ERROR on binding");
 
+  listen(sockfd, 5);
+  clilen = sizeof(cli_addr);
+  newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+  if (newsockfd < 0) error("ERROR on accept");
 
   if((pid = fork()) < 0) {
     error("Error forking child process");
   } else if (pid == 0) { //handle the child fork
-    listen(sockfd, 5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) error("ERROR on accept");
     // read handshake
     verify_client(newsockfd);
 
@@ -187,14 +187,11 @@ int main(int argc, char *argv[])
     // send the plaintext back to the client
     send_plaintext(newsockfd, cipher_buffer);
 
-    close(newsockfd);
     free(cipher_buffer);
     free(key_buffer);
     
   } else { // handle the parent fork
-    do {
-      wpid = waitpid(pid, &status, WUNTRACED);
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    close(newsockfd);
   }
   
   // exit(0); 
