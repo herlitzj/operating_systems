@@ -38,7 +38,7 @@ char encrypt_char(char plain, char key) {
   return dictionary[plain_index];
 }
 
-void encrypt(char cipher[], char plain[], int length, char key[]) {
+void encrypt(char *plain, int length, char *key) {
   int i=0;
   while(plain[i] != '\0') {
     cipher[i] = encrypt_char(plain[i], key[i]);
