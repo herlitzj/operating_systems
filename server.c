@@ -44,6 +44,7 @@ void encrypt(char cipher[], char plain[], int length, char key[]) {
     cipher[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
+  cipher[i] = '\0';
 }
 
 int main(int argc, char *argv[])
