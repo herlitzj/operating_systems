@@ -72,6 +72,8 @@ void encrypt(char *plain, int length, char *key) {
     plain[i] = encrypt_char(plain[i], key[i]);
     i++;
   }
+
+  plain[i] = '\0';
 }
 
 // function for authenticating an incoming call from a client

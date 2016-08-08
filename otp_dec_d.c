@@ -70,6 +70,8 @@ void decrypt(char *cipher, int length, char *key) {
     cipher[i] = decrypt_char(cipher[i], key[i]);
     i++;
   }
+
+  cipher[i] = '\0';
 }
 
 void handshake_response(int socket) {
