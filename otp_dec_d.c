@@ -67,7 +67,7 @@ char decrypt_char(char cipher, char key) {
 void decrypt(char *cipher, int length, char *key) {
   int i=0;
   for(i; i < length; i++) {
-    cipher[i] = decrypt_char(cipher[i], key[i])
+    cipher[i] = decrypt_char(cipher[i], key[i]);
   }
   // while(cipher[i] != '\0') {
   //   cipher[i] = decrypt_char(cipher[i], key[i]);
