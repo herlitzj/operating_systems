@@ -13,6 +13,7 @@
 #define ENC_HANDSHAKE 54321
 #define USAGE "otp_enc [plaintext] [key] [port] [&]"
 
+// general error function
 void error(const char *msg) {
   fprintf(stderr, "Client: ");
   fprintf(stderr, msg);
@@ -20,6 +21,7 @@ void error(const char *msg) {
   exit(1);
 }
 
+// general function for reading data from the socket
 void read_from_socket(int socket, unsigned int message_length, void* message, int retries) {
   int bytes_read = 0;
   int result;
@@ -35,6 +37,7 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
   }
 }
 
+// general function for writing data to the socket
 void write_to_socket(int socket, unsigned int message_length, void* message, int retries) {
   int result;
 
@@ -49,6 +52,7 @@ void write_to_socket(int socket, unsigned int message_length, void* message, int
   }
 }
 
+// a function to load text from a file to a buffer
 void get_file_text(char *buffer, char *file_location) {
   FILE *f = fopen(file_location, "r");
   if (f != NULL) {
@@ -64,6 +68,8 @@ void get_file_text(char *buffer, char *file_location) {
   }
 }
 
+// function to validate plaintext input to make sure it matches the style
+// used by the encryption method
 void validate_plaintext(char *buffer, int length) {
   int i;
   for(i = 0; i < length; i++) {
@@ -73,6 +79,7 @@ void validate_plaintext(char *buffer, int length) {
   }
 }
 
+// function to initiate handshake with the server
 void intiate_handshake(int socket, int retries) {
   int n;
   unsigned int handshake = ENC_HANDSHAKE;
@@ -98,6 +105,10 @@ void intiate_handshake(int socket, int retries) {
 
 }
 
+// function to send a message to the server
+// sends a header then waits for a response from the server
+// if response is 200 OK then it sends the body and waits for a response
+// if it gets a bad response it retries a MAX of 5 times
 void send_message(int socket, char *message_buffer, int retries) {
   int n;
   unsigned int response = 0;
@@ -128,6 +139,10 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 }
 
+// function to get a message from the server
+// it reads a header off the server then sends a response
+// then it creates a buffer of the size stipulated in the header
+// then it reads the message into the buffer and returns the buffer
 char *get_from_server(int socket) {
   int n;
   unsigned int message_length = 0;
