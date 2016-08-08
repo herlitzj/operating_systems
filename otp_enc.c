@@ -34,7 +34,7 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
   }
 }
 
-void write_to_socket(int socket, unsigned int message_length, char *message, int retries) {
+void write_to_socket(int socket, unsigned int message_length, void* message, int retries) {
   int result;
 
   if(retries > 5) {
@@ -99,7 +99,7 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 
   // send header with length of message
-  write_to_socket(socket, sizeof(message_length), &message_length, 0);
+  write_to_socket(socket, sizeof(message_length), (void *)&message_length, 0);
   // n = write(socket, &message_length, sizeof(message_length));
   // if (n < 0) error("Error writing to socket");
 
@@ -108,7 +108,7 @@ void send_message(int socket, char *message_buffer, int retries) {
 
   if (response == 200) {
     // write plaintext to sever
-    write_to_socket(socket, message_length, message_buffer, 0);
+    write_to_socket(socket, message_length, (void *)message_buffer, 0);
     // n = write(socket, message_buffer, message_length);
     // if (n < 0) error("ERROR writing to socket");
 
