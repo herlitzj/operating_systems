@@ -14,9 +14,8 @@
 #define USAGE "otp_dec [ciphertext] [key] [port] [&]"
 
 void error(const char *msg) {
-  printf("Client: ");
   perror(msg);
-  exit(1);
+  return 1;
 }
 
 void read_from_socket(int socket, unsigned int message_length, void* message, int retries) {
