@@ -54,7 +54,7 @@ char encrypt_char(char plain, char key) {
   char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
   int position = 0;
   int plain_index = 0, key_index = 0;
-  if(plain == '\n') return plain;
+  if(plain == '\n' || plain == '\0') return plain;
   for(position; position < 28; position++) {
     if (plain == dictionary[position]) plain_index = position;
     if (key == dictionary[position]) key_index = position;
@@ -68,12 +68,13 @@ char encrypt_char(char plain, char key) {
 // loops over the buffer and encrypts each char
 void encrypt(char *plain, int length, char *key) {
   int i=0;
-  while(plain[i] != '\0') {
-    plain[i] = encrypt_char(plain[i], key[i]);
-    i++;
+  for(i; i <= length; i++) {
+    plain[i] = encrypt_char(plain[i], key[i]);  
   }
-
-  plain[i] = '\0';
+  // while(plain[i] != '\0') {
+  //   plain[i] = encrypt_char(plain[i], key[i]);
+  //   i++;
+  // }
 }
 
 // function for authenticating an incoming call from a client

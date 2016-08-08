@@ -50,8 +50,8 @@ char decrypt_char(char cipher, char key) {
   char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
   int position = 0;
   int cipher_index = 0, key_index = 0;
-  if(cipher == '\n') return cipher;
-  if(cipher == EOF) return '\0';
+  if(cipher == '\n' || cipher == '\0') return cipher;
+  if(cipher == EOF) return cipher;
   for(position; position < 28; position++) {
     if (cipher == dictionary[position]) cipher_index = position;
     if (key == dictionary[position]) key_index = position;
@@ -66,12 +66,13 @@ char decrypt_char(char cipher, char key) {
 
 void decrypt(char *cipher, int length, char *key) {
   int i=0;
-  while(cipher[i] != '\0') {
-    cipher[i] = decrypt_char(cipher[i], key[i]);
-    i++;
+  for(i; i < length; i++) {
+    cipher[i] = decrypt_char(cipher[i], key[i])
   }
-
-  cipher[i] = '\0';
+  // while(cipher[i] != '\0') {
+  //   cipher[i] = decrypt_char(cipher[i], key[i]);
+  //   i++;
+  // }
 }
 
 void handshake_response(int socket) {
