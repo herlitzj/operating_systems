@@ -81,8 +81,8 @@ void handshake_response(int socket) {
   response = entry_key == DEC_HANDSHAKE ? RESPONSE_OK : RESPONSE_BAD_REQUEST;
   
   n = write(socket, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
-  if (response == 400) error("BAD REQUEST");
+  if (n < 0) error("error writing to socket");
+  if (response == 400) error("Bad request");
 }
 
 char *get_from_client(int socket) {
@@ -128,6 +128,8 @@ void send_to_client(int socket, char *message_buffer, int retries) {
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
+  } else {
+    send_to_client(socket, message_buffer, retries++);
   }
 
   if (response == 200) {
