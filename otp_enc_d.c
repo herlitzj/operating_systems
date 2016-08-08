@@ -87,7 +87,7 @@ void handshake_response(int socket) {
   
   n = write(socket, &response, sizeof(response));
   if (n < 0) error("Error writing to socket");
-  if (response == 400) error("Bad request");
+  if (response == 400) exit(1);
 }
 
 // function for reading messages from the client

@@ -81,7 +81,7 @@ void handshake_response(int socket) {
   
   n = write(socket, &response, sizeof(response));
   if (n < 0) error("error writing to socket");
-  if (response == 400) error("Bad request");
+  if (response == 400) exit(1);
 }
 
 char *get_from_client(int socket) {
