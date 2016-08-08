@@ -68,10 +68,6 @@ char encrypt_char(char plain, char key) {
 // loops over the buffer and encrypts each char
 void encrypt(char *plain, int length, char *key) {
   int i=0;
-  for(i; i <= length; i++) {
-    printf("CH: %c, NU: %i\n", plain[i], plain[i]);
-  }
-  i=0;
   while(plain[i] != '\0') {
     plain[i] = encrypt_char(plain[i], key[i]);
     i++;

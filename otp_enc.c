@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
   char *cipher_text = get_from_server(sockfd);
 
   // print the decrypted message to stdout
-  printf("%s\n", cipher_text);
+  printf("%s", cipher_text);
 
   free(cipher_text);
   close(sockfd);

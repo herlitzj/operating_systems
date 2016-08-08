@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
   char *plain_text = get_from_server(sockfd);
 
   // print the decrypted message to stdout
-  printf("%s\n", plain_text);
+  printf("%s", plain_text);
 
   free(plain_text);
   close(sockfd);
