@@ -14,7 +14,7 @@
 #define USAGE "otp_enc [plaintext] [key] [port] [&]"
 
 void error(const char *msg) {
-  perror("Client: ");
+  printf("Client: ");
   perror(msg);
   exit(1);
 }
@@ -25,7 +25,7 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
 
   if(retries > 5) {
     close(socket);
-    error("Server Error: Cannot read from socket.\n");
+    error("Server Error: Cannot read from socket");
   }
   result = read(socket, message, message_length);
   if (result < 1 ) {
@@ -44,19 +44,18 @@ void get_file_text(char *buffer, char *file_location) {
     }
     fclose(f);
   } else {
-    error("Error opening file\n");
+    error("Error opening file");
   }
 }
 
 void intiate_handshake(int socket, int retries) {
-  printf("HANDSHAKE");
   int n;
   unsigned int handshake = ENC_HANDSHAKE;
   unsigned int response = 0;
 
   if(retries > 5) {
     close(socket);
-    error("Error writing to socket. Too many failed attempts\n");
+    error("Error writing to socket. Too many failed attempts");
   }
 
   // send handshake
@@ -68,26 +67,25 @@ void intiate_handshake(int socket, int retries) {
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
     if(response == 400) {
       close(socket);
-      error("Connection declined by server\n");
+      error("Connection declined by server");
     }
   }
 
 }
 
 void send_message(int socket, char *message_buffer, int retries) {
-  printf("SENDING MESSAGE");
   int n;
   unsigned int response = 0;
   unsigned int message_length = strlen(message_buffer) + 1;
 
   if(retries > 5) {
     close(socket);
-    error("Error sending buffer to client. Too many failed attempts\n");
+    error("Error sending buffer to client. Too many failed attempts");
   }
 
   // send header with length of message
   n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("Error writing to socket\n");
+  if (n < 0) error("Error writing to socket");
 
   // read response from server
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -95,14 +93,13 @@ void send_message(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     // write plaintext to sever
     n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket\n");
+    if (n < 0) error("ERROR writing to socket");
 
     // read response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
   }
 
   if (response == 200) {
-    printf("MESSAGE SENT SUCCESSFULLY");  
   } else {
     send_message(socket, message_buffer, retries++);
   }
@@ -118,7 +115,7 @@ char *get_from_server(int socket) {
 
   // send OK response to server
   n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket\n");
+  if (n < 0) error("ERROR writing to socket");
 
   // read message from the server
   char *temp_buffer = malloc(sizeof (char) *message_length);
@@ -126,7 +123,7 @@ char *get_from_server(int socket) {
 
   // send OK response to server
   n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket\n");
+  if (n < 0) error("ERROR writing to socket");
 
   return temp_buffer;
 }
@@ -146,11 +143,11 @@ int main(int argc, char *argv[])
   portno = atoi(argv[3]);
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sockfd < 0) error("Error opening socket\n");
+  if (sockfd < 0) error("Error opening socket");
   server = gethostbyname("localhost");
 
   if (server == NULL) {
-    error("Error, no such host\n");
+    error("Error, no such host");
   }
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -159,7 +156,7 @@ int main(int argc, char *argv[])
   serv_addr.sin_port = htons(portno);
 
   if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-    error("Error connecting\n");
+    error("Error connecting");
 
   // read the files (ciphertext and key) into buffers for sending
   get_file_text(plain_text, argv[1]);

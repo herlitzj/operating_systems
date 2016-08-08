@@ -12,6 +12,7 @@
 #define USAGE "otp_dec_d [port] [&]"
 
 void error(const char *msg) {
+  printf("Server: ")
   perror(msg);
   exit(1);
 }
@@ -146,12 +147,12 @@ void send_to_client(int socket, char *message_buffer, int retries) {
 
   if(retries > 5) {
     close(socket);
-    error("Error sending message to client. Too many failed attempts\n");
+    error("Error sending message to client. Too many failed attempts");
   }
 
   // send header with length of message
   n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("ERROR writing to socket\n");
+  if (n < 0) error("ERROR writing to socket");
 
   // read response from client
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -159,7 +160,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     // write plaintext to client
     n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket\n");
+    if (n < 0) error("ERROR writing to socket");
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -185,7 +186,7 @@ int main(int argc, char *argv[]) {
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sockfd < 0) error("Error opening socket\n");
+  if (sockfd < 0) error("Error opening socket");
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
   portno = atoi(argv[1]);
@@ -195,16 +196,16 @@ int main(int argc, char *argv[]) {
 
   if (bind(sockfd, (struct sockaddr *) &serv_addr,
     sizeof(serv_addr)) < 0) 
-    error("Error on binding\n");
+    error("Error on binding");
 
   while(1) {
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) error("Error on accept\n");
+    if (newsockfd < 0) error("Error on accept");
 
     if((pid = fork()) < 0) {
-      error("Error forking child process\n");
+      error("Error forking child process");
     } else if (pid == 0) { //handle the child fork
       // read handshake
       handshake_response(newsockfd);

@@ -12,7 +12,7 @@
 #define USAGE "otp_enc_d [port] [&]"
 
 void error(const char *msg) {
-  perror("Server: ");
+  printf("Server: ");
   perror(msg);
   exit(1);
 }
@@ -62,7 +62,7 @@ void handshake_response(int socket) {
   response = entry_key == ENC_HANDSHAKE ? RESPONSE_OK : RESPONSE_BAD_REQUEST;
   
   n = write(socket, &response, sizeof(response));
-  if (n < 0) error("ERROR writing to socket");
+  if (n < 0) error("Error writing to socket");
   if (response == 400) error("BAD REQUEST");
 }
 
@@ -76,7 +76,7 @@ char *get_from_client(int socket) {
 
   // send response to client
   n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket\n");
+  if (n < 0) error("Error writing to socket");
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
@@ -84,7 +84,7 @@ char *get_from_client(int socket) {
 
   // send response to client
   n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket\n");
+  if (n < 0) error("Error writing to socket");
 
   return temp_buffer;
 
@@ -149,7 +149,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
 
   // send header with length of cipher
   n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("Error writing to socket\n");
+  if (n < 0) error("Error writing to socket");
 
   // read response from client
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -157,7 +157,7 @@ void send_to_client(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     // write ciphertext to client
     n = write(socket, message_buffer, message_length);
-    if (n < 0) error("Error writing to socket\n");
+    if (n < 0) error("Error writing to socket");
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (sockfd < 0) error("Error opening socket\n");
+  if (sockfd < 0) error("Error opening socket");
 
   bzero((char *) &serv_addr, sizeof(serv_addr));
   portno = atoi(argv[1]);
@@ -192,13 +192,13 @@ int main(int argc, char *argv[]) {
   serv_addr.sin_port = htons(portno);
 
   if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-    error("Error on binding\n");
+    error("Error on binding");
 
   while(1) {
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) error("ERROR on accept\n");
+    if (newsockfd < 0) error("ERROR on accept");
 
     if((pid = fork()) < 0) {
       error("Error forking child process");
