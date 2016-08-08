@@ -12,7 +12,7 @@
 #define USAGE "otp_dec_d [port] [&]"
 
 void error(const char *msg) {
-  fprintf(stderr, msg)
+  fprintf(stderr, msg);
   perror("Server");
   exit(1);
 }
