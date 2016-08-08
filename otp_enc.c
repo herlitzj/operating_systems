@@ -100,7 +100,7 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 
   // send header with length of message
-  write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0)
+  write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0);
   // n = write(socket, &message_length, sizeof(message_length));
   // if (n < 0) error("Error writing to socket");
 
@@ -109,7 +109,7 @@ void send_message(int socket, char *message_buffer, int retries) {
 
   if (response == 200) {
     // write plaintext to sever
-    write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0)
+    write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0);
     // n = write(socket, message_buffer, message_length);
     // if (n < 0) error("ERROR writing to socket");
 
