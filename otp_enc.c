@@ -27,7 +27,23 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
     close(socket);
     error("Server Error: Cannot read from socket");
   }
+
   result = read(socket, message, message_length);
+  if (result < 1 ) {
+    read_from_socket(socket, message_length, message, retries++);
+  }
+}
+
+void write_to_socket(int socket, unsigned int message_length, void* message, int retries) {
+  int bytes_read = 0;
+  int result;
+
+  if(retries > 5) {
+    close(socket);
+    error("Server Error: Cannot write to socket");
+  }
+
+  result = write(socket, message, message_length);
   if (result < 1 ) {
     read_from_socket(socket, message_length, message, retries++);
   }
@@ -84,16 +100,18 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 
   // send header with length of message
-  n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("Error writing to socket");
+  write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0)
+  // n = write(socket, &message_length, sizeof(message_length));
+  // if (n < 0) error("Error writing to socket");
 
   // read response from server
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
     // write plaintext to sever
-    n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket");
+    write_to_socket(socket, sizeof(message_buffer), (void *)message_buffer, 0)
+    // n = write(socket, message_buffer, message_length);
+    // if (n < 0) error("ERROR writing to socket");
 
     // read response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
