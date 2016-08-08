@@ -63,6 +63,15 @@ void get_file_text(char *buffer, char *file_location) {
   }
 }
 
+void validate_plaintext(char *buffer, int length) {
+  int i;
+  for(i = 0; i < length; i++) {
+    if((buffer[i] < 'A' || buffer[i] > 'Z') && buffer[i] != '\n' && buffer[i] != '\0' && buffer[i] != ' ') {
+      error("Message invalid");
+    }
+  }
+}
+
 void intiate_handshake(int socket, int retries) {
   int n;
   unsigned int handshake = ENC_HANDSHAKE;
@@ -171,6 +180,7 @@ int main(int argc, char *argv[])
 
   // read the files (ciphertext and key) into buffers for sending
   get_file_text(plain_text, argv[1]);
+  validate_plaintext(plain_text, strlen(plain_text));
   get_file_text(key, argv[2]);
 
   if(strlen(key) < strlen(plain_text)) {
