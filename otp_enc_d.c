@@ -14,7 +14,7 @@
 void error(const char *msg) {
   fprintf(stderr, "Server: ");
   fprintf(stderr, msg);
-  fprintf(stderr, '\n')
+  fprintf(stderr, "\n")
   exit(1);
 }
 
