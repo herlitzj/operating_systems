@@ -93,14 +93,14 @@ char *get_from_client(int socket) {
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to client
-  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok, 0);
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send response to client
-  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok, 0);
 
   return temp_buffer;
 }
@@ -116,16 +116,14 @@ void send_to_client(int socket, char *message_buffer, int retries) {
   }
 
   // send header with length of message
-  n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // read response from client
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
     // write plaintext to client
-    n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket");
+    write_to_socket(socket, message_length, (void *)message_buffer, 0);
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);

@@ -127,14 +127,14 @@ char *get_from_server(int socket) {
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to server
-  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok, 0);
 
   // read message from the server
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send OK response to server
-  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok, 0);
 
   return temp_buffer;
 }
