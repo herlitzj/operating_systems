@@ -14,8 +14,9 @@
 #define USAGE "otp_dec [ciphertext] [key] [port] [&]"
 
 void error(const char *msg) {
+  fprintf(stderr, "Client: ");
   fprintf(stderr, msg);
-  perror("Client");
+  fprintf(stderr, '\n')
   exit(1);
 }
 

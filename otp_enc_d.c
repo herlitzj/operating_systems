@@ -12,8 +12,9 @@
 #define USAGE "otp_enc_d [port] [&]"
 
 void error(const char *msg) {
+  fprintf(stderr, "Server: ");
   fprintf(stderr, msg);
-  perror("Server");
+  fprintf(stderr, '\n')
   exit(1);
 }
 
