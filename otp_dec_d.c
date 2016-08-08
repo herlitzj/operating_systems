@@ -12,8 +12,9 @@
 #define USAGE "otp_dec_d [port] [&]"
 
 void error(const char *msg) {
-  perror(msg);
-  return 1;
+  fprintf(stderr, msg)
+  perror("Server");
+  exit(1);
 }
 
 void read_from_socket(int socket, unsigned int x, void* buffer, int retries) {
