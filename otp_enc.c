@@ -44,7 +44,7 @@ void write_to_socket(int socket, unsigned int message_length, void* message, int
 
   result = write(socket, message, message_length);
   if (result < 1 ) {
-    read_from_socket(socket, message_length, message, retries++);
+    write_to_socket(socket, message_length, message, retries++);
   }
 }
 
@@ -100,8 +100,6 @@ void send_message(int socket, char *message_buffer, int retries) {
 
   // send header with length of message
   write_to_socket(socket, sizeof(message_length), (void *)&message_length, 0);
-  // n = write(socket, &message_length, sizeof(message_length));
-  // if (n < 0) error("Error writing to socket");
 
   // read response from server
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -109,8 +107,6 @@ void send_message(int socket, char *message_buffer, int retries) {
   if (response == 200) {
     // write plaintext to sever
     write_to_socket(socket, message_length, (void *)message_buffer, 0);
-    // n = write(socket, message_buffer, message_length);
-    // if (n < 0) error("ERROR writing to socket");
 
     // read response from server
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -131,16 +127,14 @@ char *get_from_server(int socket) {
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to server
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   // read message from the server
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send OK response to server
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   return temp_buffer;
 }

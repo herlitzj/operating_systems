@@ -31,6 +31,20 @@ void read_from_socket(int socket, unsigned int x, void* buffer, int retries) {
   }
 }
 
+void write_to_socket(int socket, unsigned int message_length, void* message, int retries) {
+  int result;
+
+  if(retries > 5) {
+    close(socket);
+    error("Error writing to socket. Too many failed attempts");
+  }
+
+  result = write(socket, message, message_length);
+  if (result < 1 ) {
+    write_to_socket(socket, message_length, message, retries++);
+  }
+}
+
 char decrypt_char(char cipher, char key) {
   char *dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
   int position = 0;
@@ -79,66 +93,17 @@ char *get_from_client(int socket) {
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to client
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send response to client
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   return temp_buffer;
 }
-
-// char *get_ciphertext(int socket) {
-//   int n;
-//   unsigned int message_length = 0;
-//   unsigned int response_ok = RESPONSE_OK;
-
-//   // read header from client with length of cipher
-//   read_from_socket(socket, sizeof(message_length), (void *)&message_length);
-
-//   // send response to client
-//   n = write(socket, &response_ok, sizeof(response_ok));
-//   if (n < 0) error("ERROR writing to socket");
-
-//   // read cipher from the client
-//   char *cipher_buffer = malloc(sizeof (char) *message_length);
-//   read_from_socket(socket, message_length, cipher_buffer);
-
-//   // send response to client
-//   n = write(socket, &response_ok, sizeof(response_ok));
-//   if (n < 0) error("ERROR writing to socket");
-
-//   return cipher_buffer;
-// }
-
-// char *get_key(int socket) {
-//   int n;
-//   unsigned int message_length = 0;
-//   unsigned int response_ok = RESPONSE_OK;
-
-//   // read header from client with length of key
-//   read_from_socket(socket, sizeof(message_length), (void *)&message_length);
-
-//   // send response to client
-//   n = write(socket, &response_ok, sizeof(response_ok));
-//   if (n < 0) error("ERROR writing to socket");
-
-//   // read key from the client
-//   char *key_buffer = malloc(sizeof (char) *message_length);
-//   read_from_socket(socket, message_length, key_buffer);
-
-//   // send response to client
-//   n = write(socket, &response_ok, sizeof(response_ok));
-//   if (n < 0) error("ERROR writing to socket");
-
-//   return key_buffer;
-
-// }
 
 void send_to_client(int socket, char *message_buffer, int retries) {
   int n;

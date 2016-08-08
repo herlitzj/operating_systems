@@ -33,6 +33,20 @@ void read_from_socket(int socket, unsigned int message_length, void* message, in
   }
 }
 
+void write_to_socket(int socket, unsigned int message_length, void* message, int retries) {
+  int result;
+
+  if(retries > 5) {
+    close(socket);
+    error("Error writing to socket. Too many failed attempts");
+  }
+
+  result = write(socket, message, message_length);
+  if (result < 1 ) {
+    write_to_socket(socket, message_length, message, retries++);
+  }
+}
+
 void get_file_text(char *buffer, char *file_location) {
   FILE *f = fopen(file_location, "r");
   if (f != NULL) {
@@ -84,16 +98,14 @@ void send_message(int socket, char *message_buffer, int retries) {
   }
 
   // send header with length of message
-  n = write(socket, &message_length, sizeof(message_length));
-  if (n < 0) error("Error writing to socket");
+  write_to_socket(socket, sizeof(message_length), (void *)&message_length);
 
   // read response from client
   read_from_socket(socket, sizeof(response), (void *)&response, 0);
 
   if (response == 200) {
     // write plaintext to client
-    n = write(socket, message_buffer, message_length);
-    if (n < 0) error("ERROR writing to socket");
+    write_to_socket(socket, message_length, (void *)message_buffer);
 
     // read response from client
     read_from_socket(socket, sizeof(response), (void *)&response, 0);
@@ -114,16 +126,14 @@ char *get_from_server(int socket) {
   read_from_socket(socket, sizeof(message_length), (void *)&message_length, 0);
 
   // send OK response to client
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   // read message from the client
   char *temp_buffer = malloc(sizeof (char) *message_length);
   read_from_socket(socket, message_length, temp_buffer, 0);
 
   // send OK response to client
-  n = write(socket, &response_ok, sizeof(response_ok));
-  if (n < 0) error("ERROR writing to socket");
+  write_to_socket(socket, sizeof(response_ok), (void *)&response_ok);
 
   return temp_buffer;
 }
